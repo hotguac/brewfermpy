@@ -1,0 +1,15 @@
+[Unit]
+Description=Brewferm GUI
+After=brewferm-relays.service graphical.target
+
+[Service]
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/pi/.Xauthority
+ExecStart=/bin/bash -c '/usr/bin/python3 /home/pi/brewferm/gui.py > /home/pi/brewferm/logs/gui.log 2>&1'
+Restart=always
+RestartSec=10s
+KillMode=process
+TimeoutSec=infinity
+
+[Install]
+WantedBy=graphical.target

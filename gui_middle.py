@@ -8,7 +8,6 @@ import tkinter.font as font
 import atexit
 import logging
 import math
-#import mmap
 import os
 import random
 import signal
@@ -22,49 +21,99 @@ import paths
 
 from xchg import Xchg
 
-
-class gMiddle(tk.Frame):
-    def __init__(self, master=None):
+class gBeerTemps(tk.Frame):
+    def __init__(self, master=None, gui_in=None, gui_out=None):
         super().__init__(master)
-        self.master = master
-        self.pack()
-        
+
         self.beer_temp = "64.8"
         self.beer_target = "65.0"
-        self.sensors_out = Xchg(paths.sensors_out, 'r', default={})
+        
+        self.master = master
+        self.gui_in = gui_in
+        self.gui_out = gui_out
 
+        self.pack()
         self.create_widgets()
 
-    def get_current(self):
-        try:
-            return self.beer_temp[0:2]
-        except Exception as e:
-            logging.exception("%s %s",type(e), e)
-
-    def get_cdecimal(self):
-        try:
-            return self.beer_temp[2:4]
-        except Exception as e:
-            logging.exception("%s %s",type(e), e)
-
-    def get_target(self):
-        try:
-            return self.beer_target[:2]
-        except Exception as e:
-            logging.exception("%s %s",type(e), e)
+        self.update_temps()
 
     def update_temps(self):
         try:
             self.after(30000, self.update_temps)
+            g_in = self.gui_in.read()
+            self.beer_temp = g_in[paths.beer_temp]
+            self.beer_target = g_in[paths.beer_target]
             
-            #self.get_sensor_readings()
-            x = self.sensors_out.read()
-
-            self.current['text'] = self.get_current()
-            self.cdecimal['text'] = self.get_cdecimal()
-            self.target['text'] = self.get_target()
+            self.current['text'] = self.beer_temp[0:2]
+            self.cdecimal['text'] = self.beer_temp[2:4]
+            self.target['text'] = self.beer_target[:2]
         except Exception as e:
             logging.exception("%s %s",type(e), e)
+
+    def create_widgets(self):
+        self.current = tk.Label(self.master, text="64")
+        self.current["bg"] = colors.background
+        self.current["fg"] = colors.normal50
+        self.current["font"] = ("Arial", -180)
+        self.current.place(x=160, y=60, height=190, width=260)
+        
+        self.cdecimal = tk.Label(self.master, text=".3")
+        self.cdecimal["bg"] = colors.background
+        self.cdecimal["fg"] = colors.normal50
+        self.cdecimal["font"] = ("Arial", -70)
+        self.cdecimal.place(x=400, y=160, height=70, width=70)
+        
+        self.target = tk.Label(self.master, text="64")
+        self.target["bg"] = colors.background
+        self.target["fg"] = colors.normal50
+        self.target["font"] = ("Arial", -90)
+        self.target.place(x=580, y=110, height=100, width=160)
+
+# ---------------------------------------------------------------------------------------------------------        
+# 
+# ---------------------------------------------------------------------------------------------------------        
+class gMiddle(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+
+        self.set_initial_state()      
+        self.setup_xchg()
+       
+        self.master = master
+        self.pack()
+        self.create_widgets()
+        
+        self.btemps = gBeerTemps(master=self.values_box, gui_in=self.gui_in, gui_out=self.gui_out) # ------------------
+        
+    def set_initial_state(self):
+        self.beer_temp = "64.8"
+        self.beer_target = "65.0"
+        self.state = paths.running
+
+    def update_in(self):
+        g_in = self.gui_in.read()
+        try:
+            self.beer_temp = g_in[paths.beer_temp]
+            self.beer_target = g_in[paths.beer_target]
+            if g_in[paths.desired] == paths.paused:
+                self.state = paths.paused
+            else:
+                self.state = paths.running
+        except Exception as e:
+            logging.exception("%s %s",type(e), e)
+        
+    def setup_xchg(self):
+        self.gui_in = Xchg(paths.gui_in)
+        self.update_in()
+
+        self.gui_out = Xchg(paths.gui_out, 'w', self.format_state())
+
+    def format_state(self):
+        x = {}
+        x[paths.beer_target] = self.beer_target
+        x[paths.state] = self.state
+
+        return x
 
     def pause_brew(self):
         try:
@@ -99,7 +148,6 @@ class gMiddle(tk.Frame):
         self.values_box = tk.Frame(self.master)
         self.values_box['bg'] = colors.background
         self.values_box.place(x=0,y=40,height=320,width=800)
-        self.values_box.after(2000,self.update_temps)
 
         self.title_box = tk.Frame(self.values_box)
         self.title_box.place(x=160,y=0,height=40,width=640)
@@ -166,22 +214,3 @@ class gMiddle(tk.Frame):
         self.lbl_target["fg"] = colors.invert_text
         self.lbl_target["font"] = ("Arial", -24)
         self.lbl_target.place(x=580, y=0, height=40, width=160)
-
-        self.current = tk.Label(self.values_box, text="64")
-        self.current["bg"] = colors.background
-        self.current["fg"] = colors.normal50
-        self.current["font"] = ("Arial", -180)
-        self.current.place(x=160, y=60, height=190, width=260)
-        
-        self.cdecimal = tk.Label(self.values_box, text=".3")
-        self.cdecimal["bg"] = colors.background
-        self.cdecimal["fg"] = colors.normal50
-        self.cdecimal["font"] = ("Arial", -70)
-        self.cdecimal.place(x=400, y=160, height=70, width=70)
-        
-        self.target = tk.Label(self.values_box, text="64")
-        self.target["bg"] = colors.background
-        self.target["fg"] = colors.normal50
-        self.target["font"] = ("Arial", -90)
-        self.target.place(x=580, y=110, height=100, width=160)
-        

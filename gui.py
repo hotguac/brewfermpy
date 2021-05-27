@@ -2,20 +2,15 @@
 
 # Import 3rd party libraries --------------------------------------------------
 import tkinter as tk
-#from guizero import App, PushButton, Box, TextBox, Text, Picture
 
 # Import standard libraries ---------------------------------------------------
-import atexit
 import logging
-import math
 import os
-import signal
 import sys
 
-from datetime import datetime
+#from datetime import datetime
 
 # Import application libraries ------------------------------------------------
-import brewdb
 import colors
 import paths
 
@@ -40,12 +35,7 @@ logging.info("gui starting up")
 try:
     check_display()
 
-    logging.info("Setting up database connection")
-    bdb = brewdb.BrewDB()
-    atexit.register(bdb.cleanup)
-
     root = tk.Tk()
-
     root.attributes("-fullscreen", True)
     root.configure(bg=colors.background)
     root.configure(cursor="none")

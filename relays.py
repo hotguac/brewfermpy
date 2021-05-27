@@ -35,7 +35,17 @@ class BrewfermRelays:
 
     def update(self):
         self.desired = self.xchg_in.read()
-        self.current_state = "heat"
+        
+        if self.current_state == "heat":
+            self.current_state = "cool"
+        else: 
+            if self.current_state == "cool":
+                self.current_state = "idle"
+            else:
+                self.current_state = "heat"
+
+        # logging.debug("current = %s", self.current_state)
+
         self.xchg_out.write({"current":self.current_state})
 
 # main loop here
@@ -48,10 +58,10 @@ if __name__ == '__main__':
         atexit.register(myrelays.gpio_cleanup)
         
         count = 0
-        while count < 6:
+        while count < 600:
             count = count + 1
             myrelays.update()
-            sleep(300)
+            sleep(2)
      
     except Exception as e:
         logging.exception("%s %s", type(e), e)

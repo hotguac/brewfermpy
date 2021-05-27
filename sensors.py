@@ -3,6 +3,7 @@
 # Import standard libraries ---------------------------------------------------
 import atexit
 import logging
+import random
 import sys
 
 from datetime import datetime
@@ -43,34 +44,39 @@ from xchg import Xchg
 #         logging.error("reading one-wire interface for sensor id=%s : %s", id, e)
 #         return None
 
-def gettemp():
-    #logging.debug("in gettemp()")
-    return (0.0)
+class BrewfermSensors:
+    def __init__(self):
+        self.xchg_out = Xchg(paths.sensors_out, mode='w', default={'sensor1':'00.0', 'sensor2':'00.0', 'sensor3':'00.0' })
+        self.current_reading = {'sensor1':'00.0', 'sensor2':'00.0', 'sensor3':'00.0'}
+        self.last_reading = {}
 
-def format_temps():
-    sr = {'ts':datetime.now().isoformat(sep=' ', timespec='seconds'), 'sensor1':'00.0', 'sensor2':'00.0', 'sensor3':'00.0' }   
-    return json.dumps(sr).encode('utf-8')
+    def format_temps(self):
+        result = {}
+        result['sensor1'] = str(64.3 + random.uniform(-0.5,0.5))
+        result['sensor2'] = str(64.2 + random.uniform(-0.7,0.7))
+        result['sensor3'] = str(69.5 + random.uniform(-2.0,2.0))
+        
+        return result
+
+        #return {'sensor1':'00.0', 'sensor2':'00.0', 'sensor3':'00.0' }   
+
+    def write_temps(self):
+        self.xchg_out.write(self.format_temps())
 
 # Run Loop Here --------------------------------------------------------
-logging.basicConfig(level=logging.DEBUG, filename=paths.logs, format='%(asctime)s-%(process)d-sensors.py -%(levelname)s-%(message)s')
-logging.debug("sensors starting up")
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG, filename=paths.logs, format='%(asctime)s-%(process)d-sensors.py -%(levelname)s-%(message)s')
+    logging.debug("sensors starting up")
     try:
-#        xchg_out = Xchg('/home/pi/brewferm/xchg/sensors_out.mmap',mode='w',default={'sensor1':'00.0', 'sensor2':'00.0', 'sensor3':'00.0' })
-        xchg_out = Xchg(paths.sensors_out, mode='w', default={'sensor1':'00.0', 'sensor2':'00.0', 'sensor3':'00.0' })
+        mysensors = BrewfermSensors()
 
         count = 0
-        while (count < 1200):
+        while (count < 600):
             count = count + 1
 
-            tmp = gettemp()
-            if tmp == None:
-                logging.warning("Sensor not attached")
-
-            xchg_out.write({'sensor1':'00.1', 'sensor2':'00.1', 'sensor3':'00.1' })    
-            #update_mmap(63.9+(float(count)/150.1), 65.7-(float(count)/160.1))
-            sleep(600)
+            mysensors.write_temps()
+            sleep(8)
 
     except Exception as e:
         logging.exception("Some other error %s %s", type(e), e)
@@ -78,3 +84,4 @@ if __name__ == '__main__':
     else:
         logging.debug("clean exit")
         sys.exit(1)
+       

@@ -5,7 +5,7 @@ After=mariadb.service
 [Service]
 ExecStart=/bin/bash -c '/usr/bin/python3 /home/pi/brewferm/controller.py > /home/pi/brewferm/logs/controller.log 2>&1'
 Restart=always
-RestartSec=120s
+RestartSec=30s
 KillMode=process
 TimeoutSec=infinity
 

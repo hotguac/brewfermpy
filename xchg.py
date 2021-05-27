@@ -8,12 +8,14 @@ from datetime import datetime
 from time import sleep
 
 class Xchg():
-    def __init__(self, path=None, mode='r', default=None):
+    def __init__(self, path=None, mode='r', default={}):
         super().__init__()
         self.path = path
         self.mode = mode
         self.default = default # should be a dict
         self.last = default
+        self.pad = 256
+
         if mode == 'w':
             self.create()
 
@@ -22,7 +24,11 @@ class Xchg():
             with open(self.path, 'wb') as f:
                 f.truncate()
                 f.flush()
-                f.write(json.dumps(self.default).encode('utf-8'))
+
+                self.default['ts'] = datetime.now().isoformat(sep=' ', timespec='seconds')
+                x = json.dumps(self.default)
+                y = x.ljust(self.pad, ' ')
+                f.write(y.encode('utf-8'))
                 f.close()
         except Exception as e:
             logging.exception("mmap file create %s %s", type(e), e)
@@ -42,9 +48,11 @@ class Xchg():
             return self.default
         except Exception as e:            
             logging.exception("mmap file read %s %s", type(e), e)
+            raise(e)
             self.last = None
             return self.default
 
+# expects a dictionary object in info
     def write(self, info=None):
         if self.mode == 'r':
             logging.exception('attempted write to Xchg opened as read')
@@ -53,10 +61,11 @@ class Xchg():
             with open(self.path, 'wb') as f:
                 f.truncate()
                 f.flush()
-                f.write(json.dumps(info).encode('utf-8'))
+                f.write(json.dumps(info).ljust(self.pad).encode('utf-8'))
                 f.close()
         except Exception as e:
             logging.exception("mmap file update %s %s", type(e), e)
+            raise(e)
 
 # module test runs if module invoked directly
 if __name__ == '__main__':

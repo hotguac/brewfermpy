@@ -25,6 +25,8 @@ class gTop(tk.Frame):
         self.last_time = datetime.now().isoformat(sep=' ', timespec='seconds')
         self.pack()
         self.create_widgets()
+        logging.info("gui top started")
+
         
     def update_time(self):
         try:
@@ -72,5 +74,3 @@ class gTop(tk.Frame):
         self.image_right = tk.PhotoImage(file = paths.resources + "top_right.png")
         self.top_right = tk.Label(self.title_box, image=self.image_right)
         self.top_right.place(x=720, y=0, width=80, height=40)
-
-        

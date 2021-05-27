@@ -27,18 +27,26 @@ class gBottom(tk.Frame):
         self.master = master
         self.pack()
         self.beer_chamber = "65.9"
-        self.sensors_out = Xchg(paths.sensors_out, 'r', default={})
-        self.relays_out = Xchg(paths.relays_out, 'r', default={})
+        self.gui_in = Xchg(paths.gui_in)        
         
         self.create_widgets()
-        self.update_chamber()
+        self.update_input()
 
-    def update_chamber(self):
+    def update_input(self):
         try:
-            self.master.after(6000, self.update_chamber)
-            self.chamber['text'] = self.beer_chamber
+            self.master.after(6000, self.update_input)
+            g_in = self.gui_in.read()
+
+            self.beer_chamber = g_in[paths.chamber_temp]
+            self.desired_state = g_in[paths.desired]
+            self.current_state = g_in[paths.current]
+
+            self.chamber['text'] = self.beer_chamber[0:4]
+            self.desired['text'] = self.desired_state
+            self.current['text'] = self.current_state
+
         except Exception as e:
-            logging.exception("update_chamber")
+            logging.exception("update_input")
 
     def create_widgets(self):
         #
@@ -60,11 +68,11 @@ class gBottom(tk.Frame):
         self.chamber["font"] = ("Arial", -30)
         self.chamber.place(x=430, y=40, height=80, width=80)
         
-        self.hc_target = tk.Label(self.heatcool, text="Cool")
-        self.hc_target["bg"] = colors.background
-        self.hc_target["fg"] = colors.cool200
-        self.hc_target["font"] = ("Arial", -40)
-        self.hc_target.place(x=580, y=40, height=80, width=160)
+        self.desired = tk.Label(self.heatcool, text="Cool")
+        self.desired["bg"] = colors.background
+        self.desired["fg"] = colors.cool200
+        self.desired["font"] = ("Arial", -40)
+        self.desired.place(x=580, y=40, height=80, width=160)
 
         # do the bar at top of heat/cool section
         self.title_bar = tk.Frame(self.heatcool)
@@ -105,5 +113,3 @@ class gBottom(tk.Frame):
         self.image_lm = tk.PhotoImage(file = paths.resources + "bottom_bottom.png")
         self.left_middle = tk.Label(self.side_bar, image=self.image_lm)
         self.left_middle.place(x=0, y=60, width=160, height=60)
-
-    

@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+""" Enforces cycle time while turning relays on and off """
 
 # Import standard libraries ---------------------------------------------------
 import atexit
@@ -44,14 +45,15 @@ class BrewfermRelays:
             else:
                 self.current_state = "heat"
 
-        # logging.debug("current = %s", self.current_state)
-
         self.xchg_out.write({"current":self.current_state})
 
 # main loop here
 if __name__ == '__main__':
     try:
-        logging.basicConfig(level=logging.DEBUG, filename=paths.logs, format='%(asctime)s-%(process)d-relays.py  -%(levelname)s-%(message)s')
+        logging.basicConfig(
+            level=logging.DEBUG, filename=paths.logs, 
+            format='%(asctime)s-%(process)d-relays.py  -%(levelname)s-%(message)s')
+        
         logging.info("relays starting up")
         myrelays = BrewfermRelays(18) # BCM pin 18
         

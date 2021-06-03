@@ -1,7 +1,7 @@
 Note: This software is pre-Alpha!!! Not ready to test
 
-sudo pip3 install pillow
 sudo pip3 install mariadb
+sudo pip3 install simple-pid
 
 sudo cp services/brewferm-sensors.service /lib/systemd/system/
 sudo cp services/brewferm-relays.service /lib/systemd/system/
@@ -25,7 +25,7 @@ sudo systemctl status brewferm-relays.service
 sudo systemctl status brewferm-gui.service
 sudo systemctl status brewferm-controller.service
 
-cat /home/pi/brewferm/*.log
+cat /home/pi/brewferm/logs/*.log
 
-Todo: split into 
+Todo: add min and max on,off and between time limits to relays logic
 

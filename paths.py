@@ -20,9 +20,9 @@ beer_temp = "beer_temp"
 beer_target = "beer_target"
 chamber_temp = "chamber_temp"
 
-idle = "idle"
-cool = "cool"
-heat = "heat"
+idle = "Idle"
+cool = "Cool"
+heat = "Heat"
 
 state = "state"
 running = "running"

@@ -44,8 +44,8 @@ class Xchg():
                 return self.last
         except ValueError as e:
             logging.warning("empty mmap file '%s'", self.path)
-            self.last = None
-            return self.default
+            #self.last = None
+            return self.last
         except Exception as e:            
             logging.exception("mmap file read %s %s", type(e), e)
             raise(e)

@@ -26,7 +26,11 @@ class gBottom(tk.Frame):
         super().__init__(master)
         self.master = master
         self.pack()
-        self.beer_chamber = "65.9"
+        
+        self.beer_chamber = "XX.X"
+        self.desired_state = "Xxxx"
+        self.current_state = "Xxxx"
+
         self.gui_in = Xchg(paths.gui_in)        
         
         self.create_widgets()
@@ -41,7 +45,7 @@ class gBottom(tk.Frame):
             self.desired_state = g_in[paths.desired]
             self.current_state = g_in[paths.current]
 
-            self.chamber['text'] = self.beer_chamber[0:4]
+            self.chamber['text'] = str(self.beer_chamber)[0:4]
             self.desired['text'] = self.desired_state
             self.current['text'] = self.current_state
 

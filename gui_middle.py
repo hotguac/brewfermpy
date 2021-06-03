@@ -44,9 +44,9 @@ class gBeerTemps(tk.Frame):
             self.beer_temp = g_in[paths.beer_temp]
             self.beer_target = g_in[paths.beer_target]
             
-            self.current['text'] = self.beer_temp[0:2]
-            self.cdecimal['text'] = self.beer_temp[2:4]
-            self.target['text'] = self.beer_target[:2]
+            self.current['text'] = str(self.beer_temp)[0:2]
+            self.cdecimal['text'] = str(self.beer_temp)[2:4]
+            self.target['text'] = str(self.beer_target)[:2]
         except Exception as e:
             logging.exception("%s %s",type(e), e)
 

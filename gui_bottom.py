@@ -19,19 +19,18 @@ from datetime import datetime
 import colors
 import paths
 
-from xchg import Xchg
+from xchg import Xchg, XchgData
 
 class gBottom(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
-        self.pack()
         
-        self.beer_chamber = "XX.X"
+        self.beer_chamber = "XX"
         self.desired_state = "Xxxx"
         self.current_state = "Xxxx"
 
-        self.gui_in = Xchg(paths.gui_in)        
+        self.xd = XchgData() # we only need read in the bottom
         
         self.create_widgets()
         self.update_input()
@@ -39,13 +38,12 @@ class gBottom(tk.Frame):
     def update_input(self):
         try:
             self.master.after(6000, self.update_input)
-            g_in = self.gui_in.read()
 
-            self.beer_chamber = g_in[paths.chamber_temp]
-            self.desired_state = g_in[paths.desired]
-            self.current_state = g_in[paths.current]
-
-            self.chamber['text'] = str(self.beer_chamber)[0:4]
+            self.desired_state = self.xd.get_desired_state()
+            self.current_state = self.xd.get_current_state()
+            self.beer_chamber = self.xd.get_chamber_temp()
+                        
+            self.chamber['text'] = round(self.beer_chamber)
             self.desired['text'] = self.desired_state
             self.current['text'] = self.current_state
 
@@ -69,7 +67,7 @@ class gBottom(tk.Frame):
         self.chamber = tk.Label(self.heatcool, text="99.9")
         self.chamber["bg"] = colors.background
         self.chamber["fg"] = colors.normal400
-        self.chamber["font"] = ("Arial", -30)
+        self.chamber["font"] = ("Arial", -40)
         self.chamber.place(x=430, y=40, height=80, width=80)
         
         self.desired = tk.Label(self.heatcool, text="Cool")

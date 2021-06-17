@@ -15,16 +15,6 @@ import paths
 from xchg import Xchg
 
 # Classes ------------------------------------------------------------
-class BrewfermPID:
-    def __init__(self, set_point):
-        self.set_point = set_point
-        self.pid = PID(1, 0.5, 0.01)
-        self.auto_mode = True
-
-    # Functions ------------------------------------------------------------
-    def update(self, current_temp):
-        return self.pid(current_temp)
-
 class BeerPID:
     def __init__(self, set_point):      
         self.sample_time = 60.0 # seconds
@@ -47,6 +37,36 @@ class BeerPID:
         self.set_point = target
         self.pid.set_point = self.set_point
       
+    def get_tuning(self):
+        try:
+            x = {}
+            x['kp'] = self.kp
+            x['ki'] = self.ki
+            x['kd'] = self.kd
+            x['sample_time'] = self.pid.sample_time
+            return x
+        except Exception as e:
+            logging.exception('%s %s', type(e), e)
+
+    def set_tuning(self, new_settings):
+        try:
+            if new_settings['kp'] is not None:
+                self.kp = new_settings['kp']
+                
+            if new_settings['ki'] is not None:
+                self.kp = new_settings['ki']
+                
+            if new_settings['kd'] is not None:
+                self.kp = new_settings['kd']
+                
+            self.pid.tunings = self.kp, self.ki, self.kd
+
+            if new_settings['sample_time'] is not None:
+                self.pid.sample_time = new_settings['sample_time']
+
+        except Exception as e:
+            logging.exception('%s %s', type(e), e)
+
 class ChamberPID:
     def __init__(self, set_point):
         
@@ -72,6 +92,35 @@ class ChamberPID:
 
         return self.pid(float(current_temp))
 
+    def get_tuning(self):
+        try:
+            x = {}
+            x['kp'] = self.kp
+            x['ki'] = self.ki
+            x['kd'] = self.kd
+            x['sample_time'] = self.pid.sample_time
+            return x
+        except Exception as e:
+            logging.exception('%s %s', type(e), e)
+
+    def set_tuning(self, new_settings):
+        try:
+            if new_settings['kp'] is not None:
+                self.kp = new_settings['kp']
+                
+            if new_settings['ki'] is not None:
+                self.kp = new_settings['ki']
+                
+            if new_settings['kd'] is not None:
+                self.kp = new_settings['kd']
+                
+            self.pid.tunings = self.kp, self.ki, self.kd
+
+            if new_settings['sample_time'] is not None:
+                self.pid.sample_time = new_settings['sample_time']
+
+        except Exception as e:
+            logging.exception('%s %s', type(e), e)
 
 # main loop here
 if __name__ == '__main__':

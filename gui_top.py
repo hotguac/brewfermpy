@@ -23,10 +23,7 @@ class gTop(tk.Frame):
         super().__init__(master)
         self.master = master
         self.last_time = datetime.now().isoformat(sep=' ', timespec='seconds')
-        self.pack()
         self.create_widgets()
-        logging.info("gui top started")
-
         
     def update_time(self):
         try:

@@ -6,6 +6,7 @@ import tkinter as tk
 # Import standard libraries ---------------------------------------------------
 import logging
 import os
+import signal
 import sys
 
 #from datetime import datetime
@@ -25,8 +26,18 @@ def check_display():
     if os.environ.get('DISPLAY','') == '':
         logging.warning('no display found. Using :0.0')
         os.environ.__setitem__('DISPLAY', ':0.0')
-    else:
-        logging.info(os.environ.get('DISPLAY',''))
+
+def closing_time(self, *args):
+    logging.info("shutting down")
+    if tg is not None:
+        tg.quit()
+    if gm is not None:
+        gm.quit()
+    if bg is not None:
+        bg.quit()
+    if root is not None:
+        root.quit()
+    sys.exit(0)
 
 # App -------------------------------------------------------------------------
 logging.basicConfig(level=logging.DEBUG, filename=paths.logs, format='%(asctime)s-%(process)d-gui.py     -%(levelname)s - %(message)s')
@@ -36,20 +47,22 @@ try:
     check_display()
 
     root = tk.Tk()
+    signal.signal(signal.SIGTERM, closing_time)
+    
     root.attributes("-fullscreen", True)
     root.configure(bg=colors.background)
     root.configure(cursor="none")
 
     root.update_idletasks()
-    logging.info("Canvas Size = height %d and width %d",root.winfo_height(), root.winfo_width())
-
 except _tkinter.TclError as e:
-    logging.info("display not ready yet...")
-    sys.exit(1)
+    logging.info("exiting, display not ready yet...")
+    sys.exit(0)
 
 except Exception as e:
     logging.exception("%s %s",type(e), e)
     sys.exit(1)
+
+logging.info("Canvas Size = height %d and width %d",root.winfo_height(), root.winfo_width())
 
 #
 #   Widgets ---------------------------------------------------------------------
@@ -68,3 +81,5 @@ try:
     root.mainloop()
 except Exception as e:
     logging.exception("%s %s",type(e), e)
+
+sys.exit(0)

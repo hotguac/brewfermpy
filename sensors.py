@@ -11,17 +11,28 @@ from datetime import datetime
 from time import sleep
 
 # Import application libraries ------------------------------------------------
+import killer
 import paths
-from xchg import Xchg
+from xchg import XchgData
 
 # Functions ------------------------------------------------------------
 
 class BrewfermSensors:
     def __init__(self):
-        self.xchg_out = Xchg(paths.sensors_out, mode='w', default={'sensor1':'00.0', 'sensor2':'00.0', 'sensor3':'00.0' })
-        self.default_reading = {'sensor1':'00.0', 'sensor2':'00.0', 'sensor3':'00.0'}
+        self.xd = XchgData(paths.sensors_out)
+
         self.last_reading = {}
         self.current_reading = {}
+
+    def update_mapping(self):
+        try:
+            self.id_map = self.xd.get_sensor_map()
+
+            self.id_map['sensor1'] = 'beer'
+            self.id_map['sensor3'] = 'chamber' 
+
+        except Exception as e:
+            logging.exception('update_mapping %s %s', type(e), e)
 
     def random_temps(self):
         result = {}
@@ -31,12 +42,27 @@ class BrewfermSensors:
         
         return result
 
+    def map_sensors(self, readings):
+        result = {}
+        count = 0
+        try:
+            for id in readings.keys():
+                if id in self.id_map:
+                    result[self.id_map[id]] = {id : readings[id]}
+                else:
+                    count += 1
+                    result['unknown_' + str(count)] = {id : readings[id]}
+        except Exception as e:
+            logging.exception('map_sensors %s %s', type(e), e)
+            
+        return result
+
     def write_temps(self):
         self.scan_sensors()
         if self.current_reading:
-            self.xchg_out.write(self.current_reading)
+            self.xd.write_sensors(self.map_sensors(self.current_reading))
         else:
-            self.xchg_out.write(self.random_temps())
+            self.xd.write_sensors(self.map_sensors(self.random_temps()))
 
     def scan_sensors(self):
         self.current_reading = {}
@@ -89,10 +115,9 @@ if __name__ == '__main__':
     try:
         mysensors = BrewfermSensors()
 
-        count = 0
-        while (count < 600):
-            count = count + 1
-
+        killer = killer.GracefulKiller()
+        while not killer.kill_now:
+            mysensors.update_mapping()
             mysensors.write_temps()
             sleep(8)
 
@@ -101,5 +126,5 @@ if __name__ == '__main__':
         sys.exit(1)
     else:
         logging.info("clean exit")
-        sys.exit(1)
+        sys.exit(0)
        

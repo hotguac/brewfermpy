@@ -6,12 +6,14 @@ xchg = base + 'xchg/'
 resources = base + 'resources/'
 
 sensors_out = xchg + 'sensors_out.mmap'
-
-relays_in = xchg + 'relays_in.mmap'
+controller_out = xchg + 'controller_out.mmap'
 relays_out = xchg + 'relays_out.mmap'
-
-gui_in = xchg + 'gui_in.mmap'
 gui_out = xchg + 'gui_out.mmap'
+
+#gui_in = xchg + 'gui_in.mmap'
+
+beerPID = 'beerPID'
+chamberPID = 'chamberPID'
 
 current = "current"
 desired = "desired"

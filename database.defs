@@ -1,3 +1,5 @@
+#MariaDB [brewferm]> desc history;
+
 CREATE TABLE `history` (
   `ts` timestamp(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `beer_actual` decimal(4,1) DEFAULT NULL,
@@ -15,6 +17,8 @@ CREATE TABLE `history` (
   `chamber_d` float DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 
+
+# MariaDB [brewferm]> desc changes;
 CREATE TABLE `changes` (
   `ts` timestamp(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `beer_target` decimal(4,1) DEFAULT NULL,

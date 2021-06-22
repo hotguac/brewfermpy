@@ -9,8 +9,6 @@ import os
 import signal
 import sys
 
-#from datetime import datetime
-
 # Import application libraries ------------------------------------------------
 import colors
 import paths
@@ -19,13 +17,15 @@ from gui_top import gTop
 from gui_middle import gMiddle
 from gui_bottom import gBottom
 
+
 # Functions -------------------------------------------------------------------
 # make sure there is an environment variable for DISPLAY
 # so we can run the GUI
 def check_display():
-    if os.environ.get('DISPLAY','') == '':
+    if os.environ.get('DISPLAY', '') == '':
         logging.warning('no display found. Using :0.0')
         os.environ.__setitem__('DISPLAY', ':0.0')
+
 
 def closing_time(self, *args):
     logging.info("shutting down")
@@ -39,8 +39,12 @@ def closing_time(self, *args):
         root.quit()
     sys.exit(0)
 
+
 # App -------------------------------------------------------------------------
-logging.basicConfig(level=logging.DEBUG, filename=paths.logs, format='%(asctime)s-%(process)d-gui.py     -%(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.DEBUG,
+    filename=paths.logs,
+    format='%(asctime)s-%(process)d-gui.py     -%(levelname)s - %(message)s')
 logging.info("gui starting up")
 
 try:
@@ -48,38 +52,40 @@ try:
 
     root = tk.Tk()
     signal.signal(signal.SIGTERM, closing_time)
-    
+
     root.attributes("-fullscreen", True)
     root.configure(bg=colors.background)
     root.configure(cursor="none")
 
     root.update_idletasks()
-except _tkinter.TclError as e:
+except _tkinter.TclError:  # flake8 complains but works at run time???
     logging.info("exiting, display not ready yet...")
     sys.exit(0)
-
 except Exception as e:
-    logging.exception("%s %s",type(e), e)
+    logging.exception("%s %s", type(e), e)
     sys.exit(1)
 
-logging.info("Canvas Size = height %d and width %d",root.winfo_height(), root.winfo_width())
+logging.info(
+    "Canvas Size = height %d and width %d",
+    root.winfo_height(),
+    root.winfo_width())
 
 #
-#   Widgets ---------------------------------------------------------------------
+#   Widgets -----------------------------------
 #
 try:
     tg = gTop(master=root)
     gm = gMiddle(master=root)
-    bg = gBottom(master=root)   
+    bg = gBottom(master=root)
 except Exception as e:
-    logging.exception("%s %s",type(e), e)
+    logging.exception("%s %s", type(e), e)
 
 #
-#   Display ---------------------------------------------------------------------
+#   Display -----------------------------------
 #
 try:
     root.mainloop()
 except Exception as e:
-    logging.exception("%s %s",type(e), e)
+    logging.exception("%s %s", type(e), e)
 
 sys.exit(0)

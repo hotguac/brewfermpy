@@ -13,8 +13,8 @@ import killer
 import paths
 from xchg import XchgData
 
-# Functions ------------------------------------------------------------
 
+# Functions ------------------------------------------------------------
 class BrewfermSensors:
     def __init__(self):
         self.xd = XchgData(paths.sensors_out)
@@ -33,7 +33,7 @@ class BrewfermSensors:
         result['sensor1'] = str(64.3 + random.uniform(-0.5, 0.5))
         result['sensor2'] = str(64.2 + random.uniform(-0.7, 0.7))
         result['sensor3'] = str(69.5 + random.uniform(-2.0, 2.0))
-        
+
         return result
 
     def map_sensors(self, readings):
@@ -42,13 +42,13 @@ class BrewfermSensors:
         try:
             for id in readings.keys():
                 if id in self.id_map:
-                    result[self.id_map[id]] = {id : readings[id]}
+                    result[self.id_map[id]] = {id: readings[id]}
                 else:
                     count += 1
-                    result['unknown_' + str(count)] = {id : readings[id]}
+                    result['unknown_' + str(count)] = {id: readings[id]}
         except Exception as e:
             logging.exception('map_sensors %s %s', type(e), e)
-            
+
         return result
 
     def write_temps(self):
@@ -66,44 +66,49 @@ class BrewfermSensors:
                 for candidate in possible:
                     t1 = self.gettemp(candidate.name)
                     if t1 is not None:
-                        logging.info('found %s', candidate.name)                    
+                        logging.info('found %s', candidate.name)
                         self.current_reading[candidate.name] = t1
         except Exception as e:
-            logging.exception('scan_sensors')
+            logging.exception('%s %s', type(e), e)
 
     def gettemp(self, id):
         try:
             mytemp = ''
             filename = 'w1_slave'
-            
+
             f = open('/sys/bus/w1/devices/' + id + '/' + filename, 'r')
-            line = f.readline() # read 1st line
-            
-            crc = line.rsplit(' ',1)
+            line = f.readline()  # read 1st line
+
+            crc = line.rsplit(' ', 1)
             crc = crc[1].replace('\n', '')
-            
+
             if crc == 'YES':
-                line = f.readline() # read 2nd line
-                mytemp = float(line.rsplit('t=',1))
+                line = f.readline()  # read 2nd line
+                mytemp = float(line.rsplit('t=', 1))
             else:
                 mytemp = float(-99999)
-                logging.error("CRC not valid for sensor id=%s",id)
-                
+                logging.error("CRC not valid for sensor id=%s", id)
+
             f.close()
-        
+
             return int(mytemp[1])
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             # not everything in the directory is a one-wire temp sensor
             return None
         except Exception as e:
-            logging.exception("reading one-wire interface for sensor id=%s : %s", id, e)
+            logging.exception(
+                'reading one-wire interface for sensor id=%s : %s',
+                id,
+                e)
             return None
 
 # Run Loop Here --------------------------------------------------------
 
+
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG, filename=paths.logs, 
-                        format='%(asctime)s-%(process)d-sensors.py -%(levelname)s-%(message)s')
+    logging.basicConfig(
+        level=logging.DEBUG, filename=paths.logs,
+        format='%(asctime)s-%(process)d-sensors.py -%(levelname)s-%(message)s')
 
     logging.info("sensors starting up")
     try:
@@ -121,4 +126,3 @@ if __name__ == '__main__':
     else:
         logging.info("clean exit")
         sys.exit(0)
-       

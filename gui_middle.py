@@ -1,24 +1,22 @@
 #!/usr/bin/python3
 
-# Import 3rd party libraries --------------------------------------------------
+# Import 3rd party libraries ----------------------------------------
 import tkinter as tk
 import tkinter.font as font
 
-# Import standard libraries ---------------------------------------------------
-import atexit
+# Import standard libraries -----------------------------------------
 import logging
 
-from datetime import datetime
-
-# Import application libraries ------------------------------------------------
+# Import application libraries --------------------------------------
 import colors
 import paths
 
 from xchg import XchgData
 
-#--------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------
 #
-#--------------------------------------------------------------------------------
+# -------------------------------------------------------------------
 class gBeerTemps(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
@@ -26,8 +24,8 @@ class gBeerTemps(tk.Frame):
 
         self.beer_temp = "64.8"
         self.beer_target = "65.0"
-        
-        self.xd = XchgData() # read only for now
+
+        self.xd = XchgData()  # read only for now
 
         self.create_widgets()
         self.update_temps()
@@ -36,12 +34,12 @@ class gBeerTemps(tk.Frame):
         try:
             self.after(1000, self.update_temps)
             self.beer_temp = self.xd.get('beer')
-            self.beer_target = self.xd.get('target') 
-            
+            self.beer_target = self.xd.get('target')
+
             self.current['text'] = str(round(self.beer_temp))
             self.target['text'] = str(round(self.beer_target))
         except Exception as e:
-            logging.exception("%s %s",type(e), e)
+            logging.exception("%s %s", type(e), e)
 
     def create_widgets(self):
         self.current = tk.Label(self.master.values_box, text="64")
@@ -56,23 +54,24 @@ class gBeerTemps(tk.Frame):
         self.target["font"] = ("Arial", -80)
         self.target.place(x=580, y=120, height=100, width=160)
 
-# ---------------------------------------------------------------------------------------------------------        
-# 
-# ---------------------------------------------------------------------------------------------------------        
+
+# ------------------------------------------------
+# Middle section of screen
+# ------------------------------------------------
 class gMiddle(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
 
-        self.set_initial_state()      
+        self.set_initial_state()
         self.xd = XchgData(paths.gui_out)
-       
+
         self.master = master
         self.create_widgets()
-        
+
         self.btemps = None
 
         self.after(10000, self.update_out)
-        
+
     def set_initial_state(self):
         self.beer_temp = "64.8"
         self.beer_target = "65.0"
@@ -88,10 +87,10 @@ class gMiddle(tk.Frame):
         self.chamber_kd = 0.0
         self.chamber_sample_time = 10
 
-        self.relays_off_on = 6 # minutes - give compressor time
-        self.relays_max_on = 6 # minutes
+        self.relays_off_on = 6  # minutes - give compressor time
+        self.relays_max_on = 6  # minutes
         self.relays_hc_balance = 2.0
-        self.relays_zone_size = 20 # 0-20 cool ; 80-100 heat
+        self.relays_zone_size = 20  # 0-20 cool ; 80-100 heat
 
     def update_out(self):
         try:
@@ -103,45 +102,44 @@ class gMiddle(tk.Frame):
             self.xd.write_gui(self.format_state())
         except Exception as e:
             logging.exception('%s %s', type(e), e)
-                  
+
     def format_state(self):
         x = {}
         x[paths.beer_target] = self.beer_target
         x[paths.state] = self.state
 
         self.beer_pid = {
-            'kp' : self.beer_kp, 
-            'ki' : self.beer_ki, 
-            'kd' : self.beer_kd, 
-            'sample_time' : self.beer_sample_time
+            'kp': self.beer_kp,
+            'ki': self.beer_ki,
+            'kd': self.beer_kd,
+            'sample_time': self.beer_sample_time
             }
 
         x['beer_pid'] = self.beer_pid
 
         self.chamber_pid = {
-            'kp' : self.chamber_kp, 
-            'ki' : self.chamber_ki, 
-            'kd' : self.chamber_kd, 
-            'sample_time' : self.chamber_sample_time
+            'kp': self.chamber_kp,
+            'ki': self.chamber_ki,
+            'kd': self.chamber_kd,
+            'sample_time': self.chamber_sample_time
             }
 
         x['chamber_pid'] = self.chamber_pid
 
         self.relays = {
-            'off_on' : self.relays_off_on,
-            'max_on' : self.relays_max_on,
-            'hc_balance' : self.relays_hc_balance,
-            'zone_size' : self.relays_zone_size
+            'off_on': self.relays_off_on,
+            'max_on': self.relays_max_on,
+            'hc_balance': self.relays_hc_balance,
+            'zone_size': self.relays_zone_size
         }
 
         x['relays'] = self.relays
 
         self.id_map = {
-            'sensor1' : 'beer',
-            'sensor2' : 'chamber' 
-
+            'sensor1': 'beer',
+            'sensor2': 'chamber'
         }
-        
+
         x['id_map'] = self.id_map
 
         return x
@@ -173,86 +171,87 @@ class gMiddle(tk.Frame):
     def create_widgets(self):
         self.values_box = tk.Frame(self.master)
         self.values_box['bg'] = colors.background
-        self.values_box.place(x=0,y=40,height=320,width=800)
+        self.values_box.place(x=0, y=40, height=320, width=800)
 
         self.title_box = tk.Frame(self.values_box)
-        self.title_box.place(x=160,y=0,height=40,width=640)
+        self.title_box.place(x=160, y=0, height=40, width=640)
         self.title_box['bg'] = colors.background
 
         self.button_box = tk.Frame(self.values_box)
         self.button_box['bg'] = colors.background
-        self.button_box.place(x=0,y=0,height=320,width=160)
+        self.button_box.place(x=0, y=0, height=320, width=160)
 
-        self.image_tc = tk.PhotoImage(file = paths.resources + "top_corner.png")
+        self.image_tc = tk.PhotoImage(file=paths.resources + "top_corner.png")
         self.top_corner = tk.Label(self.button_box, image=self.image_tc)
         self.top_corner.place(x=0, y=0, width=160, height=60)
 
-        self.image_bc = tk.PhotoImage(file = paths.resources + "bottom_corner.png")
+        self.image_bc = tk.PhotoImage(
+            file=paths.resources + "bottom_corner.png")
         self.bottom_corner = tk.Label(self.button_box, image=self.image_bc)
         self.bottom_corner.place(x=0, y=260, width=160, height=60)
 
         self.button_font = font.Font(family="Arial", size=-18, weight="normal")
 
         self.pause_button = tk.Button(
-            self.button_box, 
+            self.button_box,
             text="Pause",
-            command = self.pause_brew,
-            bg = colors.normal_button,
-            font = self.button_font,
-            activebackground = colors.normal_button,
-            highlightbackground = colors.normal_button,
-            highlightcolor = colors.normal_button,
-            relief = tk.FLAT
+            command=self.pause_brew,
+            bg=colors.normal_button,
+            font=self.button_font,
+            activebackground=colors.normal_button,
+            highlightbackground=colors.normal_button,
+            highlightcolor=colors.normal_button,
+            relief=tk.FLAT
             )
 
         self.pause_button.place(x=10, y=70, height=52, width=110)
 
         self.settings_button = tk.Button(
-            self.button_box, 
-            text="Settings", 
+            self.button_box,
+            text="Settings",
             command=self.settings,
-            background = colors.normal_button,
-            borderwidth = 0,
-            highlightthickness = 0,
-            font = self.button_font,
-            activebackground = colors.normal_button,
-            highlightbackground = colors.normal_button,
-            highlightcolor = colors.normal_button,
-            relief = tk.FLAT
+            background=colors.normal_button,
+            borderwidth=0,
+            highlightthickness=0,
+            font=self.button_font,
+            activebackground=colors.normal_button,
+            highlightbackground=colors.normal_button,
+            highlightcolor=colors.normal_button,
+            relief=tk.FLAT
             )
 
         self.settings_button.place(x=10, y=134, height=52, width=110)
 
         self.exit_button = tk.Button(
-            self.button_box, 
-            text="Exit", 
+            self.button_box,
+            text="Exit",
             command=self.exit_brew,
-            background = colors.normal_button,
-            borderwidth = 0,
-            highlightthickness = 0,
-            font = self.button_font,
-            activebackground = colors.normal_button,
-            highlightbackground = colors.normal_button,
-            highlightcolor = colors.normal_button,
-            relief = tk.FLAT
+            background=colors.normal_button,
+            borderwidth=0,
+            highlightthickness=0,
+            font=self.button_font,
+            activebackground=colors.normal_button,
+            highlightbackground=colors.normal_button,
+            highlightcolor=colors.normal_button,
+            relief=tk.FLAT
             )
 
         self.exit_button.place(x=10, y=198, height=52, width=110)
 
-        self.image_bb = tk.PhotoImage(file = paths.resources + "bottom_bar.png")
+        self.image_bb = tk.PhotoImage(file=paths.resources + "bottom_bar.png")
         self.bottom_bar = tk.Label(self.values_box, image=self.image_bb)
         self.bottom_bar.place(x=160, y=280, width=640, height=40)
 
-        self.image_tb = tk.PhotoImage(file = paths.resources + "top_bar.png")
+        self.image_tb = tk.PhotoImage(file=paths.resources + "top_bar.png")
         self.top_bar = tk.Label(self.values_box, image=self.image_tb)
         self.top_bar.place(x=160, y=0, width=640, height=40)
 
         self.lbl_current = tk.Label(
-            self.values_box, 
+            self.values_box,
             text="Temp F",
-            bg = colors.background,
-            fg = colors.invert_text,
-            font = ("Arial", -24)
+            bg=colors.background,
+            fg=colors.invert_text,
+            font=("Arial", -24)
             )
 
         self.lbl_current.place(x=220, y=0, height=40, width=160)

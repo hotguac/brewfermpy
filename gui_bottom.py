@@ -2,12 +2,9 @@
 
 # Import 3rd party libraries --------------------------------------------------
 import tkinter as tk
-from PIL import Image, ImageTk
 
 # Import standard libraries ---------------------------------------------------
 import logging
-
-from datetime import datetime
 
 # Import application libraries ------------------------------------------------
 import colors
@@ -15,17 +12,18 @@ import paths
 
 from xchg import XchgData
 
+
 class gBottom(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
-        
+
         self.beer_chamber = "XX"
         self.desired_state = "Xxxx"
         self.current_state = "Xxxx"
 
-        self.xd = XchgData() # we only need read in the bottom
-        
+        self.xd = XchgData()  # we only need read in the bottom
+
         self.create_widgets()
         self.update_input()
 
@@ -36,7 +34,7 @@ class gBottom(tk.Frame):
             self.desired_state = self.xd.get('desired')
             self.current_state = self.xd.get('current')
             self.beer_chamber = self.xd.get('chamber')
-                        
+
             self.chamber['text'] = round(self.beer_chamber)
             self.desired['text'] = self.desired_state
             self.current['text'] = self.current_state
@@ -57,13 +55,13 @@ class gBottom(tk.Frame):
         self.current["fg"] = colors.normal50
         self.current["font"] = ("Arial", -60)
         self.current.place(x=160, y=40, height=80, width=220)
-        
+
         self.chamber = tk.Label(self.heatcool, text="99.9")
         self.chamber["bg"] = colors.background
         self.chamber["fg"] = colors.normal400
         self.chamber["font"] = ("Arial", -40)
         self.chamber.place(x=430, y=40, height=80, width=80)
-        
+
         self.desired = tk.Label(self.heatcool, text="Cool")
         self.desired["bg"] = colors.background
         self.desired["fg"] = colors.cool200
@@ -75,7 +73,7 @@ class gBottom(tk.Frame):
         self.title_bar.place(x=160, y=0, height=40, width=640)
         self.title_bar['bg'] = colors.background
 
-        self.image_tb = tk.PhotoImage(file = paths.resources + "top_bar.png")
+        self.image_tb = tk.PhotoImage(file=paths.resources + "top_bar.png")
         self.top_bar = tk.Label(self.title_bar, image=self.image_tb)
         self.top_bar.place(x=0, y=0, width=640, height=40)
 
@@ -84,13 +82,13 @@ class gBottom(tk.Frame):
         self.running["fg"] = colors.invert_text
         self.running["font"] = ("Arial", -24)
         self.running.place(x=50, y=0, height=40, width=100)
-        
+
         self.lbl_chamber = tk.Label(self.title_bar, text="Chamber F")
         self.lbl_chamber["bg"] = colors.background
         self.lbl_chamber["fg"] = colors.invert_text
         self.lbl_chamber["font"] = ("Arial", -16)
         self.lbl_chamber.place(x=260, y=0, height=40, width=110)
-        
+
         self.target = tk.Label(self.title_bar, text="Desired")
         self.target["bg"] = self.title_bar["bg"]
         self.target["fg"] = colors.invert_text
@@ -102,10 +100,11 @@ class gBottom(tk.Frame):
         self.side_bar['bg'] = colors.background
         self.side_bar.place(x=0, y=0, height=120, width=160)
 
-        self.image_tc = tk.PhotoImage(file = paths.resources + "top_corner.png")
+        self.image_tc = tk.PhotoImage(file=paths.resources + "top_corner.png")
         self.top_corner = tk.Label(self.side_bar, image=self.image_tc)
         self.top_corner.place(x=0, y=0, width=160, height=60)
 
-        self.image_lm = tk.PhotoImage(file = paths.resources + "bottom_bottom.png")
+        self.image_lm = tk.PhotoImage(
+            file=paths.resources + "bottom_bottom.png")
         self.left_middle = tk.Label(self.side_bar, image=self.image_lm)
         self.left_middle.place(x=0, y=60, width=160, height=60)

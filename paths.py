@@ -10,8 +10,6 @@ controller_out = xchg + 'controller_out.mmap'
 relays_out = xchg + 'relays_out.mmap'
 gui_out = xchg + 'gui_out.mmap'
 
-#gui_in = xchg + 'gui_in.mmap'
-
 beerPID = 'beerPID'
 chamberPID = 'chamberPID'
 

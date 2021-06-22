@@ -16,6 +16,7 @@ import killer
 import paths
 from xchg import XchgData
 
+
 # Classes ------------------------------------------------------------
 class BrewfermRelays:
     def __init__(self, pin_number):
@@ -41,7 +42,7 @@ class BrewfermRelays:
 
     def update(self):
         keep_alive = 2
-        ka_ts = datetime.now() - timedelta(minutes=keep_alive)          
+        ka_ts = datetime.now() - timedelta(minutes=keep_alive)
 
         try:
             self.desired_state = self.xd.get('desired')
@@ -50,7 +51,8 @@ class BrewfermRelays:
             # pause system if controller isn't updating desired state
             if (self.desired_state is None) or (self.desired_ts is None):
                 if self.current_state != paths.paused:
-                    logging.warning('missing controller output, going to pause')
+                    logging.warning(
+                        'missing controller output, going to pause')
                 self.desired_state = paths.paused
                 self.sleep_time = 10
                 self.timeout = True
@@ -58,7 +60,8 @@ class BrewfermRelays:
                 x = parser.parse(self.desired_ts)
                 if x < ka_ts:
                     if self.current_state != paths.paused:
-                        logging.warning('old controller output, going to pause')
+                        logging.warning(
+                            'old controller output, going to pause')
                     self.desired_state = paths.paused
                     self.sleep_time = 10
                     self.timeout = True
@@ -67,41 +70,44 @@ class BrewfermRelays:
                         logging.info('found controller output, resuming...')
                         self.timeout = False
                     self.sleep_time = 2
-                    
+
         except Exception as e:
             logging.exception('input mmap not ready %s %s', type(e), e)
             sys.exit(1)
-            
+
         if self.desired_state == paths.paused:
             self.current_state = self.desired_state
         else:
             # do more checks here to see if timers passed for state change
             self.current_state = self.desired_state
-                        
+
     def post_current(self):
         try:
-            self.xd.write_relays({"current":self.current_state})
+            self.xd.write_relays({"current": self.current_state})
         except Exception as e:
             logging.exception('%s %s', type(e), e)
+
 
 # main loop here
 if __name__ == '__main__':
     try:
         logging.basicConfig(
-            level=logging.DEBUG, filename=paths.logs, 
-            format='%(asctime)s-%(process)d-relays.py  -%(levelname)s-%(message)s')
-        
+            level=logging.DEBUG, filename=paths.logs,
+            format=(
+                '%(asctime)s-%(process)d-relays.py  '
+                '-%(levelname)s-%(message)s'))
+
         logging.info("relays starting up")
-        myrelays = BrewfermRelays(18) # BCM pin 18
-        
+        myrelays = BrewfermRelays(18)  # BCM pin 18
+
         atexit.register(myrelays.gpio_cleanup)
-        
+
         killer = killer.GracefulKiller()
         while not killer.kill_now:
             myrelays.update()
             myrelays.post_current()
             sleep(myrelays.sleep_time)
-     
+
     except Exception as e:
         logging.exception("%s %s", type(e), e)
 

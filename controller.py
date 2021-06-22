@@ -1,19 +1,19 @@
-import atexit
 import logging
 import sys
 
 from time import sleep
 
-# Import application libraries ------------------------------------------------
+# Import application libraries --------------------------------------
 import killer
 import paths
 
 from pid import BeerPID, ChamberPID
 from xchg import XchgData
 
-# ---------------------------------------------------------------------------------------------------------        
-# 
-# ---------------------------------------------------------------------------------------------------------        
+
+# -------------------------------------------------------------------
+# Handles PID and sends desired to relays
+# -------------------------------------------------------------------
 class BrewfermController():
     def __init__(self):
         super().__init__()
@@ -27,7 +27,7 @@ class BrewfermController():
 
         self.beerPID = BeerPID(self.beer_target)
         self.chamberPID = ChamberPID(self.beer_target)
-        
+
         self.beerPID_tuning = self.xd.get('beer_pid')
         self.beerPID.set_tuning(self.beerPID_tuning)
 
@@ -60,11 +60,11 @@ class BrewfermController():
         chambertuning = self.xd.get('chamber_pid')
         if chambertuning != self.chamberPID_tuning:
             self.chamberPID.set_tuning(self.chamberPID_tuning)
-        
+
     def calculate(self):
         try:
             x = self.beerPID.update(self.beer_temp)
-    
+
             self.chamberPID.change_target(x)
             self.heat_cool = self.chamberPID.update(float(self.chamber_temp))
         except Exception as e:
@@ -72,23 +72,25 @@ class BrewfermController():
 
     def output_desired(self):
         try:
-            self.xd.write_controller({paths.desired : self.desired_state})
+            self.xd.write_controller({paths.desired: self.desired_state})
         except Exception as e:
             logging.exception("%s %s", type(e), e)
 
-# ---------------------------------------------------------------------------------------------------------        
+
+# -------------------------------------------------------------------
 # main loop here
-# ---------------------------------------------------------------------------------------------------------        
+# -------------------------------------------------------------------
 if __name__ == '__main__':
     try:
         logging.basicConfig(
-            level=logging.DEBUG, filename=paths.logs, 
-            format='%(asctime)s-%(process)d-controller.py -%(levelname)s-%(message)s')
+            level=logging.DEBUG, filename=paths.logs,
+            format=(
+                '%(asctime)s-%(process)d-controller.py -'
+                '%(levelname)s-%(message)s'))
 
         logging.info("controller starting up")
 
         mycontroller = BrewfermController()
-        
         killer = killer.GracefulKiller()
 
         while not killer.kill_now:

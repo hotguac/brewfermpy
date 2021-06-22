@@ -14,7 +14,7 @@ from time import sleep
 # Import application libraries ------------------------------------------------
 import killer
 import paths
-from xchg import Xchg, XchgData
+from xchg import XchgData
 
 # Classes ------------------------------------------------------------
 class BrewfermRelays:
@@ -25,6 +25,7 @@ class BrewfermRelays:
         self.setup_gpio()
         self.xd = XchgData(paths.relays_out)
         self.sleep_time = 2
+        self.timeout = False
 
     # Functions ------------------------------------------------------------
     def setup_gpio(self):
@@ -39,36 +40,43 @@ class BrewfermRelays:
         GPIO.cleanup()
 
     def update(self):
+        keep_alive = 2
+        ka_ts = datetime.now() - timedelta(minutes=keep_alive)          
+
         try:
-            self.desired = self.xd.get_desired_state()
-            self.desired_ts = self.xd.get_desired_ts()    
+            self.desired_state = self.xd.get('desired')
+            self.desired_ts = self.xd.get('desired_ts')
 
             # pause system if controller isn't updating desired state
-            if (self.desired is None) or (self.desired_ts is None):
-                self.desired = paths.paused
-                self.current = paths.paused
-                self.sleep_time = 20
-                return
-
-            keep_alive = 2
-            if parser.parse(self.desired_ts) < datetime.now() - timedelta(minutes=keep_alive):
-                self.desired = paths.paused
-                self.current = paths.paused
-                self.sleep_time = 20
-                return
-
-            self.sleep_time = 2
-            self.current = self.desired
+            if (self.desired_state is None) or (self.desired_ts is None):
+                if self.current_state != paths.paused:
+                    logging.warning('missing controller output, going to pause')
+                self.desired_state = paths.paused
+                self.sleep_time = 10
+                self.timeout = True
+            else:
+                x = parser.parse(self.desired_ts)
+                if x < ka_ts:
+                    if self.current_state != paths.paused:
+                        logging.warning('old controller output, going to pause')
+                    self.desired_state = paths.paused
+                    self.sleep_time = 10
+                    self.timeout = True
+                else:
+                    if self.timeout:
+                        logging.info('found controller output, resuming...')
+                        self.timeout = False
+                    self.sleep_time = 2
                     
         except Exception as e:
             logging.exception('input mmap not ready %s %s', type(e), e)
             sys.exit(1)
             
-        try:
-            self.current_state = self.desired
-        except Exception as e:
-            logging.exception('%s %s', type(e), e)
-            sys.exit(1)
+        if self.desired_state == paths.paused:
+            self.current_state = self.desired_state
+        else:
+            # do more checks here to see if timers passed for state change
+            self.current_state = self.desired_state
                         
     def post_current(self):
         try:

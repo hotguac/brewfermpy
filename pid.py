@@ -1,18 +1,13 @@
 #!/usr/bin/python3
 #""" PID clases configured for the beer and the chamber """
+
 # Import standard libraries ---------------------------------------------------
-import atexit
 import logging
-import RPi.GPIO as GPIO
-import sys
 
 from simple_pid import PID 
 
-from time import sleep
-
 # Import application libraries ------------------------------------------------
 import paths
-from xchg import Xchg
 
 # Classes ------------------------------------------------------------
 class BeerPID:
@@ -50,18 +45,18 @@ class BeerPID:
 
     def set_tuning(self, new_settings):
         try:
-            if new_settings['kp'] is not None:
+            if new_settings.get('kp') is not None:
                 self.kp = new_settings['kp']
                 
-            if new_settings['ki'] is not None:
+            if new_settings.get('ki') is not None:
                 self.kp = new_settings['ki']
                 
-            if new_settings['kd'] is not None:
+            if new_settings.get('kd') is not None:
                 self.kp = new_settings['kd']
                 
             self.pid.tunings = self.kp, self.ki, self.kd
 
-            if new_settings['sample_time'] is not None:
+            if new_settings.get('sample_time') is not None:
                 self.pid.sample_time = new_settings['sample_time']
 
         except Exception as e:
@@ -105,18 +100,18 @@ class ChamberPID:
 
     def set_tuning(self, new_settings):
         try:
-            if new_settings['kp'] is not None:
+            if new_settings.get('kp') is not None:
                 self.kp = new_settings['kp']
                 
-            if new_settings['ki'] is not None:
+            if new_settings.get('ki') is not None:
                 self.kp = new_settings['ki']
                 
-            if new_settings['kd'] is not None:
+            if new_settings.get('kd') is not None:
                 self.kp = new_settings['kd']
                 
             self.pid.tunings = self.kp, self.ki, self.kd
 
-            if new_settings['sample_time'] is not None:
+            if new_settings.get('sample_time') is not None:
                 self.pid.sample_time = new_settings['sample_time']
 
         except Exception as e:

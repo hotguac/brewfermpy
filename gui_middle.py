@@ -7,11 +7,6 @@ import tkinter.font as font
 # Import standard libraries ---------------------------------------------------
 import atexit
 import logging
-import math
-import os
-import random
-import signal
-import sys
 
 from datetime import datetime
 
@@ -19,7 +14,7 @@ from datetime import datetime
 import colors
 import paths
 
-from xchg import Xchg, XchgData
+from xchg import XchgData
 
 #--------------------------------------------------------------------------------
 #
@@ -40,8 +35,8 @@ class gBeerTemps(tk.Frame):
     def update_temps(self):
         try:
             self.after(1000, self.update_temps)
-            self.beer_temp = self.xd.get_beer_temp()
-            self.beer_target = self.xd.get_target_temp() 
+            self.beer_temp = self.xd.get('beer')
+            self.beer_target = self.xd.get('target') 
             
             self.current['text'] = str(round(self.beer_temp))
             self.target['text'] = str(round(self.beer_target))
@@ -83,6 +78,21 @@ class gMiddle(tk.Frame):
         self.beer_target = "65.0"
         self.state = paths.running
 
+        self.beer_kp = 4.0
+        self.beer_ki = 0.005
+        self.beer_kd = 0.0
+        self.beer_sample_time = 60
+
+        self.chamber_kp = 4.0
+        self.chamber_ki = 0.005
+        self.chamber_kd = 0.0
+        self.chamber_sample_time = 10
+
+        self.relays_off_on = 6 # minutes - give compressor time
+        self.relays_max_on = 6 # minutes
+        self.relays_hc_balance = 2.0
+        self.relays_zone_size = 20 # 0-20 cool ; 80-100 heat
+
     def update_out(self):
         try:
             self.after(1000, self.update_out)
@@ -98,6 +108,41 @@ class gMiddle(tk.Frame):
         x = {}
         x[paths.beer_target] = self.beer_target
         x[paths.state] = self.state
+
+        self.beer_pid = {
+            'kp' : self.beer_kp, 
+            'ki' : self.beer_ki, 
+            'kd' : self.beer_kd, 
+            'sample_time' : self.beer_sample_time
+            }
+
+        x['beer_pid'] = self.beer_pid
+
+        self.chamber_pid = {
+            'kp' : self.chamber_kp, 
+            'ki' : self.chamber_ki, 
+            'kd' : self.chamber_kd, 
+            'sample_time' : self.chamber_sample_time
+            }
+
+        x['chamber_pid'] = self.chamber_pid
+
+        self.relays = {
+            'off_on' : self.relays_off_on,
+            'max_on' : self.relays_max_on,
+            'hc_balance' : self.relays_hc_balance,
+            'zone_size' : self.relays_zone_size
+        }
+
+        x['relays'] = self.relays
+
+        self.id_map = {
+            'sensor1' : 'beer',
+            'sensor2' : 'chamber' 
+
+        }
+        
+        x['id_map'] = self.id_map
 
         return x
 

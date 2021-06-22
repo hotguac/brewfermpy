@@ -7,7 +7,6 @@ import sys
 
 from datetime import datetime, timedelta
 from pathlib import Path
-from time import sleep
 
 import paths
 
@@ -43,118 +42,104 @@ class XchgData():
         self.relays_out = None
         self.gui_out = Xchg(paths.gui_out, self.gui_mode)
 
-    def get_current_state(self):
+    def get(self, field_name):
+        try:
+            switcher = {
+                'current' : lambda : self.get_relays(field_name),
+                'relays_ts' : lambda : self.get_relays('ts'),
+                'desired' : lambda : self.get_controller(field_name),
+                'desired_ts' : lambda : self.get_controller('ts'),
+                'chamber' : lambda : self.get_temp('chamber'),
+                'beer' : lambda : self.get_temp('beer'),
+                'target' : lambda : float(self.get_gui('beer_target')),
+                'beer_pid' : lambda : self.get_gui('beer_pid'),
+                'paused_state' : lambda : self.get_gui('state'),
+                'sensor_map' : lambda : self.get_gui('id_map')
+            }
+            
+            result = switcher.get(field_name)
+            if result:
+                return result()
+            else:
+                return None
+        except Exception as e:
+            logging.exception('%s %s', type(e), e)
+
+    def get_relays(self, field_name):
         try:
             if self.relays_out is None:
                 self.relays_out = Xchg(paths.relays_out, self.relays_mode)
                 
             x = self.relays_out.read()
 
-            if 'current' in x.keys():
-                return x['current']
-            else:
-                return None
+            result = None
+            if field_name in x.keys():
+                result = x[field_name]
         except Exception as e:
             logging.exception("%s %s", type(e), e)
+        
+        return result
 
-    def get_desired_state(self):
+    def get_gui(self, field_name):
+        result = None
+        try:
+            if self.gui_out is None:
+                self.gui_out = Xchg(paths.gui_out, self.gui_mode)
+                
+            x = self.gui_out.read()
+
+            result = None
+            if field_name in x.keys():
+                result = x[field_name]
+        except Exception as e:
+            logging.exception("%s %s", type(e), e)
+            return None
+        else:        
+            return result
+
+    def get_controller(self, field_name):
         try:
             if self.controller_out is None:
                 self.controller_out = Xchg(paths.controller_out, self.controller_mode)
                 
             x = self.controller_out.read()
 
-            if 'desired' in x.keys():
-                return x['desired']
-            else:
-                return None
-        except Exception as e:
-            logging.exception("%s %s", type(e), e)
-
-    def get_desired_ts(self):
-        try:
-            if self.controller_out is None:
-                self.controller_out = Xchg(paths.controller_out, self.controller_mode)
-                
-            x = self.controller_out.read()
-
-            if 'ts' in x.keys():
-                return x['ts']
-            else:
-                return None
-        except Exception as e:
-            logging.exception("%s %s", type(e), e)
-
-    def get_chamber_temp(self):
-        try:
             result = None
+            if field_name in x.keys():
+                result = x[field_name]
+        except Exception as e:
+            logging.exception("%s %s", type(e), e)
+        
+        return result
+
+    def get_temp(self, field_name):
+        result = None
+        try:
+            x = self.get_sensors(field_name)
+
+            for ct in x.keys():
+                result = float(x[ct])
+
+        except Exception as e:
+            logging.exception('%s %s', type(e), e)
+            return None
+        else:
+            return result
+
+    def get_sensors(self, field_name):
+        try:
             if self.sensors_out is None:
                 self.sensors_out = Xchg(paths.sensors_out, self.sensors_mode)
                 
             x = self.sensors_out.read()
-            if 'chamber' in x.keys():
-                for ct in x['chamber'].keys():
-                    result = float(x['chamber'][ct])
-            return result
-        except Exception as e:
-            logging.exception("%s %s", type(e), e)
 
-    def get_beer_temp(self):
-        try:
             result = None
-            if self.sensors_out is None:
-                self.sensors_out = Xchg(paths.sensors_out, self.sensors_mode)
-                
-            x = self.sensors_out.read()
-            if 'beer' in x.keys():
-                for ct in x['beer'].keys():
-                    result = float(x['beer'][ct])
-            return result
+            if field_name in x.keys():
+                result = x[field_name]
         except Exception as e:
             logging.exception("%s %s", type(e), e)
-
-    def get_target_temp(self):
-        try:
-            result = None
-            if self.gui_out is None:
-                self.gui_out = Xchg(paths.gui_out, self.gui_mode)
-                
-            x = self.gui_out.read()
-            if 'beer_target' in x.keys():
-                result = float(x['beer_target'])
-                
-            return result
-        except Exception as e:
-            logging.exception("%s %s", type(e), e)
-
-    def get_sensor_map(self):
-        try:
-            result = {}
-            if self.gui_out is None:
-                self.gui_out = Xchg(paths.gui_out, self.gui_mode)
-                
-            x = self.gui_out.read()
-            if 'id_map' in x.keys():
-                result = x['id_map']
-                
-            return result
-        except Exception as e:
-            logging.exception("%s %s", type(e), e)
-
-
-    def get_paused_state(self):
-        try:
-            result = None
-            if self.gui_out is None:
-                self.gui_out = Xchg(paths.gui_out, self.gui_mode)
-                
-            x = self.gui_out.read()
-            if 'state' in x.keys():
-                result = x['state']
-                
-            return result
-        except Exception as e:
-            logging.exception("%s %s", type(e), e)
+        
+        return result
 
     def write_controller(self, value):
         try:
@@ -209,7 +194,6 @@ class XchgData():
 # ---------------------------------------------------------------------------------------------------------        
 class Xchg():
     def __init__(self, path=None, mode='r', default={}):
-        #super().__init__()
         self.path = path
         self.mode = mode
         self.default = default # should be a dict

@@ -1,6 +1,6 @@
 [Unit]
 Description=Brewferm Controller
-After=mariadb.service
+After=brewferm-sensors.service
 
 [Service]
 ExecStart=/bin/bash -c '/usr/bin/python3 /home/pi/brewferm/controller.py > /home/pi/brewferm/logs/controller.log 2>&1'

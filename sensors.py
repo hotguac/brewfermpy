@@ -1,13 +1,11 @@
 #!/usr/bin/python3
 
 # Import standard libraries ---------------------------------------------------
-import atexit
 import logging
 import os
 import random
 import sys
 
-from datetime import datetime
 from time import sleep
 
 # Import application libraries ------------------------------------------------
@@ -26,11 +24,7 @@ class BrewfermSensors:
 
     def update_mapping(self):
         try:
-            self.id_map = self.xd.get_sensor_map()
-
-            self.id_map['sensor1'] = 'beer'
-            self.id_map['sensor3'] = 'chamber' 
-
+            self.id_map = self.xd.get('sensor_map')
         except Exception as e:
             logging.exception('update_mapping %s %s', type(e), e)
 

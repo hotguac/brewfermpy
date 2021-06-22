@@ -1,22 +1,15 @@
 import atexit
 import logging
-import math
-import os
 import sys
 
-import inspect
-
-from datetime import datetime
 from time import sleep
 
 # Import application libraries ------------------------------------------------
-import brewdb
 import killer
 import paths
 
-from pid import BeerPID
-from pid import ChamberPID
-from xchg import Xchg, XchgData
+from pid import BeerPID, ChamberPID
+from xchg import XchgData
 
 # ---------------------------------------------------------------------------------------------------------        
 # 
@@ -26,25 +19,28 @@ class BrewfermController():
         super().__init__()
 
         self.xd = XchgData(paths.controller_out)
-        self.beer_temp = self.xd.get_beer_temp()
-        self.chamber_temp = self.xd.get_chamber_temp()
-        self.beer_target = self.xd.get_target_temp()
-        self.current_state = self.xd.get_current_state()
+        self.beer_temp = self.xd.get('beer')
+        self.chamber_temp = self.xd.get('chamber')
+        self.beer_target = self.xd.get('target')
+        self.current_state = self.xd.get('current')
         self.desired_state = paths.idle
 
         self.beerPID = BeerPID(self.beer_target)
         self.chamberPID = ChamberPID(self.beer_target)
         
-        self.beerPID_tuning = {'empty' : 'yes'}
-        self.chamberPID_tuning = {'empty' : 'yes'}
+        self.beerPID_tuning = self.xd.get('beer_pid')
+        self.beerPID.set_tuning(self.beerPID_tuning)
+
+        self.chamberPID_tuning = self.xd.get('chamber_pid')
+        self.chamberPID.set_tuning(self.beerPID_tuning)
 
     def update(self):
-        self.beer_temp = self.xd.get_beer_temp()
-        self.chamber_temp = self.xd.get_chamber_temp()
-        self.beer_target = self.xd.get_target_temp()
-        self.current_state = self.xd.get_current_state()
+        self.beer_temp = self.xd.get('beer')
+        self.chamber_temp = self.xd.get('chamber')
+        self.beer_target = self.xd.get('target')
+        self.current_state = self.xd.get('current')
 
-        if self.xd.get_paused_state() == paths.paused:
+        if self.xd.get('paused_state') == paths.paused:
             self.desired_state = paths.paused
         else:
             self.calculate()
@@ -56,8 +52,14 @@ class BrewfermController():
                 self.desired_state = paths.cool
 
         self.output_desired()
-        self.beerPID_tuning = self.beerPID.get_tuning()
-        self.chamberPID_tuning = self.chamberPID.get_tuning()
+
+        beertuning = self.xd.get('beer_pid')
+        if beertuning != self.beerPID_tuning:
+            self.beerPID.set_tuning(self.beerPID_tuning)
+
+        chambertuning = self.xd.get('chamber_pid')
+        if chambertuning != self.chamberPID_tuning:
+            self.chamberPID.set_tuning(self.chamberPID_tuning)
         
     def calculate(self):
         try:

@@ -5,13 +5,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 
 # Import standard libraries ---------------------------------------------------
-import atexit
 import logging
-import math
-import mmap
-import os
-import signal
-import sys
 
 from datetime import datetime
 
@@ -19,7 +13,7 @@ from datetime import datetime
 import colors
 import paths
 
-from xchg import Xchg, XchgData
+from xchg import XchgData
 
 class gBottom(tk.Frame):
     def __init__(self, master=None):
@@ -39,16 +33,16 @@ class gBottom(tk.Frame):
         try:
             self.master.after(6000, self.update_input)
 
-            self.desired_state = self.xd.get_desired_state()
-            self.current_state = self.xd.get_current_state()
-            self.beer_chamber = self.xd.get_chamber_temp()
+            self.desired_state = self.xd.get('desired')
+            self.current_state = self.xd.get('current')
+            self.beer_chamber = self.xd.get('chamber')
                         
             self.chamber['text'] = round(self.beer_chamber)
             self.desired['text'] = self.desired_state
             self.current['text'] = self.current_state
 
         except Exception as e:
-            logging.exception("update_input")
+            logging.exception('%s %s', type(e), e)
 
     def create_widgets(self):
         #
@@ -62,7 +56,7 @@ class gBottom(tk.Frame):
         self.current["bg"] = colors.background
         self.current["fg"] = colors.normal50
         self.current["font"] = ("Arial", -60)
-        self.current.place(x=200, y=40, height=80, width=160)
+        self.current.place(x=160, y=40, height=80, width=220)
         
         self.chamber = tk.Label(self.heatcool, text="99.9")
         self.chamber["bg"] = colors.background
@@ -89,7 +83,7 @@ class gBottom(tk.Frame):
         self.running["bg"] = colors.background
         self.running["fg"] = colors.invert_text
         self.running["font"] = ("Arial", -24)
-        self.running.place(x=70, y=0, height=40, width=100)
+        self.running.place(x=50, y=0, height=40, width=100)
         
         self.lbl_chamber = tk.Label(self.title_bar, text="Chamber F")
         self.lbl_chamber["bg"] = colors.background

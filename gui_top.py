@@ -5,12 +5,7 @@ import tkinter as tk
 from PIL import ImageTk, Image
 
 # Import standard libraries ---------------------------------------------------
-import atexit
 import logging
-import math
-import os
-import signal
-import sys
 
 from datetime import datetime
 

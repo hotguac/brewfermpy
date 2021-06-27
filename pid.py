@@ -15,26 +15,28 @@ class BeerPID:
     def __init__(self, set_point):
         self.sample_time = 60.0  # seconds
 
-        self.kp = 4.0
-        self.ki = 0.2
+        self.kp = 6.0  # these should get overwriten quickly
+        self.ki = 0.8
         self.kd = 0.01
 
         self.set_point = set_point
-        self.pid = PID(set_point)
-        self.pid.sample_time = 60
-        self.pid.tunings = self.kp, self.ki, self.kd
-        self.pid.output_limits = self.set_point - 10, self.set_point + 10
+        self.pid = PID(
+            Kp=self.kp,
+            Ki=self.ki,
+            Kd=self.kd,
+            sample_time=2,
+            output_limits=(self.set_point - 10, self.set_point + 10),
+            setpoint=self.set_point)
 
     def update(self, current_temp):
-        self.pid.output_limits = (
-            float(current_temp) - 10.0,
-            float(current_temp) + 6.0)
-
+        # logging.debug('beer tuning = %s', self.pid.tunings)
         return self.pid(current_temp)
 
     def change_target(self, target):
-        self.set_point = target
-        self.pid.set_point = self.set_point
+        if target != self.set_point:
+            self.set_point = target
+            self.pid.output_limits = self.set_point - 10, self.set_point + 10
+            self.pid.set_point = self.set_point
 
     def get_tuning(self):
         try:
@@ -48,47 +50,49 @@ class BeerPID:
             logging.exception('%s %s', type(e), e)
 
     def set_tuning(self, new_settings):
+        logging.debug('beer set tuning to %s', new_settings)
         try:
             if new_settings.get('kp') is not None:
                 self.kp = new_settings['kp']
 
             if new_settings.get('ki') is not None:
-                self.kp = new_settings['ki']
+                self.ki = new_settings['ki']
 
             if new_settings.get('kd') is not None:
-                self.kp = new_settings['kd']
+                self.kd = new_settings['kd']
 
             self.pid.tunings = self.kp, self.ki, self.kd
 
             if new_settings.get('sample_time') is not None:
                 self.pid.sample_time = new_settings['sample_time']
 
+            # logging.debug('now tuned to %s', self.get_tuning())
         except Exception as e:
             logging.exception('%s %s', type(e), e)
 
 
 class ChamberPID:
     def __init__(self, set_point):
-        self.kp = 6.0
-        self.ki = 0.2
-        self.kd = 0.01
+        self.kp = 2.0
+        self.ki = 0.01
+        self.kd = 0.000001
 
-        self.pid = PID(50)
-        self.pid.sample_time = 30.0  # seconds
-        self.pid.tunings = self.kp, self.ki, self.kd
-        self.pid.output_limits = 0, 10
+        self.set_point = set_point
+        self.pid = PID(
+            Kp=self.kp,
+            Ki=self.ki,
+            Kd=self.kd,
+            sample_time=2,
+            output_limits=(1, 100),
+            setpoint=self.set_point)
 
     def change_target(self, target):
-        self.set_point = target
-        self.pid.set_point = self.set_point
+        if target != self.set_point:
+            self.set_point = target
+            self.pid.set_point = self.set_point
 
     def update(self, current_temp):
-        try:
-            x = current_temp
-            self.pid.output_limits = x - 10.0, x + 6.0
-        except Exception as e:
-            logging.exception('%s %s', type(e), e)
-
+        # logging.debug('chamber PID tuning = %s', self.pid.tunings)
         return self.pid(float(current_temp))
 
     def get_tuning(self):
@@ -103,15 +107,16 @@ class ChamberPID:
             logging.exception('%s %s', type(e), e)
 
     def set_tuning(self, new_settings):
+        # logging.debug('chamber set tuning to %s', new_settings)
         try:
             if new_settings.get('kp') is not None:
                 self.kp = new_settings['kp']
 
             if new_settings.get('ki') is not None:
-                self.kp = new_settings['ki']
+                self.ki = new_settings['ki']
 
             if new_settings.get('kd') is not None:
-                self.kp = new_settings['kd']
+                self.kd = new_settings['kd']
 
             self.pid.tunings = self.kp, self.ki, self.kd
 

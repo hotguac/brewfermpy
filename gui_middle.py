@@ -22,10 +22,10 @@ class gBeerTemps(tk.Frame):
         super().__init__(master)
         self.master = master
 
-        self.beer_temp = "64.8"
-        self.beer_target = "65.0"
-
         self.xd = XchgData()  # read only for now
+
+        self.beer_temp = self.xd.get('beer', 64.0)
+        self.beer_target = self.xd.get('target', 64.0)
 
         self.create_widgets()
         self.update_temps()
@@ -33,8 +33,8 @@ class gBeerTemps(tk.Frame):
     def update_temps(self):
         try:
             self.after(1000, self.update_temps)
-            self.beer_temp = self.xd.get('beer')
-            self.beer_target = self.xd.get('target')
+            self.beer_temp = self.xd.get('beer', 64)
+            self.beer_target = self.xd.get('target', 64)
 
             self.current['text'] = str(round(self.beer_temp))
             self.target['text'] = str(round(self.beer_target))
@@ -62,39 +62,40 @@ class gMiddle(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
 
-        self.set_initial_state()
+        self.master = master
+        self.btemps = None  # will hold a gBeerTemps object
+
         self.xd = XchgData(paths.gui_out)
 
-        self.master = master
-        self.create_widgets()
+        self.beer_temp = self.xd.get('beer', 64.0)
+        self.beer_target = self.xd.get('target', 74.0)
+        self.state = self.xd.get('paused_state', paths.running)
 
-        self.btemps = None
+        btuning = self.xd.get('beer_pid', {})
 
-        self.after(10000, self.update_out)
+        self.beer_kp = btuning.get('kp', 4.0)
+        self.beer_ki = btuning.get('ki', 0.00005)
+        self.beer_kd = btuning.get('kd', 0.0)
+        self.beer_sample_time = btuning.get('sample_time', 60)
 
-    def set_initial_state(self):
-        self.beer_temp = "64.8"
-        self.beer_target = "65.0"
-        self.state = paths.running
+        ctuning = self.xd.get('chamber_pid', {})
 
-        self.beer_kp = 4.0
-        self.beer_ki = 0.005
-        self.beer_kd = 0.0
-        self.beer_sample_time = 60
-
-        self.chamber_kp = 4.0
-        self.chamber_ki = 0.005
-        self.chamber_kd = 0.0
-        self.chamber_sample_time = 10
+        self.chamber_kp = ctuning.get('kp', 6.0)
+        self.chamber_ki = ctuning.get('ki', 0.0025)
+        self.chamber_kd = ctuning.get('kd', 0.0)
+        self.chamber_sample_time = ctuning.get('sample_time', 15)
 
         self.relays_off_on = 6  # minutes - give compressor time
         self.relays_max_on = 6  # minutes
         self.relays_hc_balance = 2.0
         self.relays_zone_size = 20  # 0-20 cool ; 80-100 heat
 
+        self.create_widgets()
+        self.after(1000, self.update_out)
+
     def update_out(self):
         try:
-            self.after(1000, self.update_out)
+            self.after(2000, self.update_out)
 
             if self.btemps is None:
                 self.btemps = gBeerTemps(master=self)

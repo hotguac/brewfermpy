@@ -44,7 +44,7 @@ class XchgData():
         self.relays_out = None
         self.gui_out = Xchg(paths.gui_out, self.gui_mode)
 
-    def get(self, field_name):
+    def get(self, field_name, default=None):
         try:
             switcher = {
                 'current': lambda: self.get_relays(field_name),
@@ -53,18 +53,22 @@ class XchgData():
                 'desired_ts': lambda: self.get_controller('ts'),
                 'chamber': lambda: self.get_temp('chamber'),
                 'beer': lambda: self.get_temp('beer'),
-                'target': lambda: float(self.get_gui('beer_target')),
+                'target': lambda: self.get_gui('beer_target'),
                 'beer_pid': lambda: self.get_gui('beer_pid'),
-                'chamber_pid': lambda: self.get_gui('beer_pid'),
+                'chamber_pid': lambda: self.get_gui('chamber_pid'),
                 'paused_state': lambda: self.get_gui('state'),
                 'sensor_map': lambda: self.get_gui('id_map')
             }
 
             result = switcher.get(field_name)  # returns a function object
             if result:
-                return result()  # execute the lambda expression function
+                x = result()
+                if x:
+                    return result()  # execute the lambda expression function
+                else:
+                    return default
             else:
-                return None
+                return default
         except Exception as e:
             logging.exception('%s %s', type(e), e)
 
@@ -90,6 +94,8 @@ class XchgData():
                 self.gui_out = Xchg(paths.gui_out, self.gui_mode)
 
             x = self.gui_out.read()
+            if x is None:
+                x = {}
 
             result = None
             if field_name in x.keys():
@@ -101,6 +107,7 @@ class XchgData():
             return result
 
     def get_controller(self, field_name):
+        result = None
         try:
             if self.controller_out is None:
                 self.controller_out = Xchg(
@@ -108,10 +115,9 @@ class XchgData():
                     self.controller_mode)
 
             x = self.controller_out.read()
-
-            result = None
-            if field_name in x.keys():
-                result = x[field_name]
+            if x:
+                if field_name in x.keys():
+                    result = x[field_name]
         except Exception as e:
             logging.exception("%s %s", type(e), e)
 
@@ -122,9 +128,9 @@ class XchgData():
         try:
             x = self.get_sensors(field_name)
 
-            for ct in x.keys():
-                result = float(x[ct])
-
+            if x:
+                for ct in x.keys():
+                    result = float(x[ct])
         except Exception as e:
             logging.exception('%s %s', type(e), e)
             return None

@@ -58,17 +58,17 @@ try:
     root.configure(cursor="none")
 
     root.update_idletasks()
-except _tkinter.TclError:  # flake8 complains but works at run time???
+except tk.TclError:
     logging.info("exiting, display not ready yet...")
     sys.exit(0)
 except Exception as e:
     logging.exception("%s %s", type(e), e)
     sys.exit(1)
-
-logging.info(
-    "Canvas Size = height %d and width %d",
-    root.winfo_height(),
-    root.winfo_width())
+else:
+    logging.info(
+        "Canvas Size = height %d and width %d",
+        root.winfo_height(),
+        root.winfo_width())
 
 #
 #   Widgets -----------------------------------

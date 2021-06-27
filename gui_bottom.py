@@ -18,7 +18,7 @@ class gBottom(tk.Frame):
         super().__init__(master)
         self.master = master
 
-        self.beer_chamber = "XX"
+        self.chamber_temp = "XX"
         self.desired_state = "Xxxx"
         self.current_state = "Xxxx"
 
@@ -33,9 +33,9 @@ class gBottom(tk.Frame):
 
             self.desired_state = self.xd.get('desired')
             self.current_state = self.xd.get('current')
-            self.beer_chamber = self.xd.get('chamber')
+            self.chamber_temp = self.xd.get('chamber', 0.0)
 
-            self.chamber['text'] = round(self.beer_chamber)
+            self.chamber['text'] = round(self.chamber_temp)
             self.desired['text'] = self.desired_state
             self.current['text'] = self.current_state
 
@@ -50,7 +50,7 @@ class gBottom(tk.Frame):
         self.heatcool["bg"] = colors.background
         self.heatcool.place(x=0, y=360, height=120, width=800)
 
-        self.current = tk.Label(self.heatcool, text="Idle")
+        self.current = tk.Label(self.heatcool, text=paths.idle)
         self.current["bg"] = colors.background
         self.current["fg"] = colors.normal50
         self.current["font"] = ("Arial", -60)

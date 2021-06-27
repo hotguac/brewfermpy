@@ -19,20 +19,31 @@ class BrewfermSensors:
     def __init__(self):
         self.xd = XchgData(paths.sensors_out)
 
-        self.last_reading = {}
         self.current_reading = {}
 
     def update_mapping(self):
         try:
-            self.id_map = self.xd.get('sensor_map')
+            self.id_map = self.xd.get('sensor_map', {})
         except Exception as e:
             logging.exception('update_mapping %s %s', type(e), e)
 
-    def random_temps(self):
+    def emulate_temps(self):
+        beer = self.xd.get('beer', 64)
+        chamber = self.xd.get('chamber', 64)
+        current = self.xd.get('current', paths.idle)
+
+        if current == paths.heat:
+            chamber += 0.03
+        elif current == paths.cool:
+            chamber -= 0.15
+
+        beer = ((beer * 99) + chamber) / 100  # transfer from chamber to beer
+        chamber = ((chamber * 59) + beer) / 60  # transfer from beer to chamber
+
         result = {}
-        result['sensor1'] = str(64.3 + random.uniform(-0.5, 0.5))
-        result['sensor2'] = str(64.2 + random.uniform(-0.7, 0.7))
-        result['sensor3'] = str(69.5 + random.uniform(-2.0, 2.0))
+        result['sensor1'] = beer
+        result['sensor2'] = chamber
+        result['sensor3'] = str(89.5 + random.uniform(-0.6, 0.6))
 
         return result
 
@@ -56,7 +67,7 @@ class BrewfermSensors:
         if self.current_reading:
             self.xd.write_sensors(self.map_sensors(self.current_reading))
         else:
-            self.xd.write_sensors(self.map_sensors(self.random_temps()))
+            self.xd.write_sensors(self.map_sensors(self.emulate_temps()))
 
     def scan_sensors(self):
         self.current_reading = {}
@@ -118,7 +129,7 @@ if __name__ == '__main__':
         while not killer.kill_now:
             mysensors.update_mapping()
             mysensors.write_temps()
-            sleep(8)
+            sleep(4)
 
     except Exception as e:
         logging.exception("Some other error %s %s", type(e), e)

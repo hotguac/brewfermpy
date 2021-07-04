@@ -20,23 +20,42 @@ class BeerPID:
         self.kd = 0.01
 
         self.set_point = set_point
+
+        low_limit = set_point - 6
+        if low_limit < 34:
+            low_limit = 34
+
+        high_limit = set_point + 4
+        if high_limit > 84:
+            high_limit = 84
+
         self.pid = PID(
             Kp=self.kp,
             Ki=self.ki,
             Kd=self.kd,
             sample_time=2,
-            output_limits=(self.set_point - 10, self.set_point + 10),
+            output_limits=(low_limit, high_limit),
             setpoint=self.set_point)
 
     def update(self, current_temp):
         # logging.debug('beer tuning = %s', self.pid.tunings)
         return self.pid(current_temp)
 
-    def change_target(self, target):
-        if target != self.set_point:
-            self.set_point = target
-            self.pid.output_limits = self.set_point - 10, self.set_point + 10
+    def change_target(self, set_point):
+        low_limit = set_point - 6
+        if low_limit < 34:
+            low_limit = 34
+
+        high_limit = set_point + 4
+        if high_limit > 84:
+            high_limit = 84
+
+        if set_point != self.set_point:
+            self.set_point = set_point
+            self.pid.output_limits = low_limit, high_limit
             self.pid.set_point = self.set_point
+            self.pid._integral = set_point
+            self.pid._last_output = set_point
 
     def get_tuning(self):
         try:
@@ -50,7 +69,6 @@ class BeerPID:
             logging.exception('%s %s', type(e), e)
 
     def set_tuning(self, new_settings):
-        logging.debug('beer set tuning to %s', new_settings)
         try:
             if new_settings.get('kp') is not None:
                 self.kp = new_settings['kp']
@@ -86,10 +104,14 @@ class ChamberPID:
             output_limits=(1, 100),
             setpoint=self.set_point)
 
-    def change_target(self, target):
-        if target != self.set_point:
-            self.set_point = target
-            self.pid.set_point = self.set_point
+        self._integral = 50
+        self._last_output = 50
+
+    # def change_target(self, target):
+    #     if target != self.set_point:
+    #         self.set_point = target
+    #         self.pid.set_point = self.set_point
+    #         # logging.debug('chamber PID tuning = %s and set point = %s', self.pid.tunings, target)
 
     def update(self, current_temp):
         # logging.debug('chamber PID tuning = %s', self.pid.tunings)

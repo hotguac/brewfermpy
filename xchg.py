@@ -270,7 +270,7 @@ class Xchg():
         except FileNotFoundError:
             if self.last_warning_ts < (datetime.now() - timedelta(minutes=5)):
                 self.last_warning_ts = datetime.now()
-                logging.warning('mmap file %s not found', self.path)
+                logging.info('mmap file %s not available yet', self.path)
             return {}
         except Exception as e:
             logging.exception("mmap file read %s %s", type(e), e)

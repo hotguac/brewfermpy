@@ -21,44 +21,65 @@ class BrewfermController():
         super().__init__()
 
         self.xd = XchgData(paths.controller_out)
+
         self.beer_temp = self.xd.get('beer')
-        self.chamber_temp = self.xd.get('chamber')
         self.beer_target = self.xd.get('target')
+        self.beer_tuning = self.xd.get('beer_pid')
+
+        self.chamber_temp = self.xd.get('chamber')
+        self.chamber_tuning = self.xd.get('chamber_pid')
+
         self.current_state = self.xd.get('current', paths.paused)
         self.desired_state = paths.idle
 
         self.beerPID = BeerPID(self.beer_target)
-        self.beerPID._last_output = self.beer_target
-        self.beerPID._integral = self.beer_target
+        self.beerPID.set_tuning(self.beer_tuning)
+        self.beerPID.pid._last_output = self.beer_target
+        self.beerPID.pid._integral = self.beer_target
+        
         self.chamberPID = ChamberPID(self.beer_target)
-
-        self.beerPID_tuning = self.xd.get('beer_pid')
-        self.beerPID.set_tuning(self.beerPID_tuning)
-
-        self.chamberPID_tuning = self.xd.get('chamber_pid')
-        self.chamberPID._last_output = 50
-        self.chamberPID._integral = 50
-        self.chamberPID.set_tuning(self.chamberPID_tuning)
+        self.chamberPID.set_tuning(self.chamber_tuning)
+        self.chamberPID.pid._last_output = 50
+        self.chamberPID.pid._integral = 50
 
         self.last_output = datetime.now() - timedelta(minutes=3)
+        self.last_chamber = self.beer_target
 
     def calculate(self):
         try:
+            if self.beer_target != self.beerPID.pid.setpoint:
+                self.beerPID.pid.setpoint = self.beer_target
+
             x = self.beerPID.update(self.beer_temp)
-            self.chamberPID.change_target(x)
+            if abs(x - self.last_chamber) > 0.1:
+                self.chamberPID.pid.setpoint = x
+                self.last_chamber = x
+
             self.heat_cool = self.chamberPID.update(float(self.chamber_temp))
+            ckp, cki, ckd = self.chamberPID.pid.components
+            bkp, bki, bkd = self.beerPID.pid.components
 
             ts = datetime.now()
-            if ts > (self.last_output + timedelta(minutes=1, seconds=20)):
+            if ts > (self.last_output + timedelta(minutes=2)):
                 self.last_output = ts
                 logging.debug(
-                    'beer = %s target = %s /'
-                    ' chamber = %s target = %s / control = %s',
+                    ' beer = %.1f / %.1f / %.1f %s / '
+                    ' chamber = %.1f / %.1f / %.1f / %.1f %s',
                     round(self.beer_temp, 2),
-                    round(self.beer_target),
+                    round(self.beerPID.pid.setpoint),
+                    round(bki, 1),
+                    (
+                        self.beerPID.pid.tunings[0],
+                        self.beerPID.pid.tunings[1]
+                    ),
                     round(self.chamber_temp, 2),
-                    round(x, 2),
-                    round(self.heat_cool, 2)
+                    round(x, 1),
+                    round(self.heat_cool, 2),
+                    round(cki, 1),
+                    (
+                        self.chamberPID.pid.tunings[0],
+                        self.chamberPID.pid.tunings[1]
+                    )
                 )
         except Exception as e:
             logging.exception("%s %s", type(e), e)
@@ -96,15 +117,19 @@ class BrewfermController():
                 chambertuning)
             self.desired_state = paths.paused
         else:
-            if beertuning != self.beerPID_tuning:
+            if beertuning != self.beer_tuning:
                 logging.debug(
                     'old beer tuning %s vs new %s',
                     beertuning,
-                    self.beerPID_tuning)
-                self.beerPID.set_tuning(self.beerPID_tuning)
+                    self.beer_tuning)
+                self.beerPID.set_tuning(self.beer_tuning)
 
-            if chambertuning != self.chamberPID_tuning:
-                self.chamberPID.set_tuning(self.chamberPID_tuning)
+            if chambertuning != self.chamber_tuning:
+                logging.debug(
+                    'old chamber tuning %s vs new %s',
+                    chambertuning,
+                    self.chamber_tuning)
+                self.chamberPID.set_tuning(self.chamber_tuning)
 
         self.output_desired()
 

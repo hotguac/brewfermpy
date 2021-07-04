@@ -1,7 +1,7 @@
 sudo systemctl start brewferm-gui.service
-sleep 20
+sleep 30
 sudo systemctl start brewferm-sensors.service
-sleep 15
+sleep 30
 sudo systemctl start brewferm-controller.service
-sleep 20
+sleep 40
 sudo systemctl start brewferm-relays.service

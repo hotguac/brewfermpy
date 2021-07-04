@@ -37,10 +37,10 @@ class BrewfermRelays:
         self.desired_state = None
 
         self.off_on = 6  # minutes
-        self.max_on = 6  # minutes
+        self.max_on = 5  # minutes
         self.min_on = 1  # minutes
 
-        self.hc_balance = 4  # multiply times for heat
+        self.hc_balance = 6  # multiply times for heat
 
     # Functions ------------------------------------------------------------
     def setup_gpio(self):
@@ -131,6 +131,7 @@ class BrewfermRelays:
                 if self.timeout:
                     logging.info('found controller output, resuming...')
                     self.timeout = False
+                    self.current_state = paths.idle
                 self.sleep_time = 2
 
         except Exception as e:

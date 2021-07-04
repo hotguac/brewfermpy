@@ -67,21 +67,21 @@ class gMiddle(tk.Frame):
 
         self.xd = XchgData(paths.gui_out)
 
-        self.beer_temp = self.xd.get('beer', 64.0)
-        self.beer_target = self.xd.get('target', 74.0)
+        self.beer_temp = self.xd.get('beer', 69.0)
+        self.beer_target = self.xd.get('target', 69.0)
         self.state = self.xd.get('paused_state', paths.running)
 
         btuning = self.xd.get('beer_pid', {})
 
-        self.beer_kp = btuning.get('kp', 4.0)
-        self.beer_ki = btuning.get('ki', 0.00005)
+        self.beer_kp = btuning.get('kp', 8.0)
+        self.beer_ki = btuning.get('ki', 0.0015)  # 0.0001
         self.beer_kd = btuning.get('kd', 0.0)
         self.beer_sample_time = btuning.get('sample_time', 60)
 
         ctuning = self.xd.get('chamber_pid', {})
 
-        self.chamber_kp = ctuning.get('kp', 6.0)
-        self.chamber_ki = ctuning.get('ki', 0.0025)
+        self.chamber_kp = ctuning.get('kp', 6.0)  # 6.0
+        self.chamber_ki = ctuning.get('ki', 0.004)  # 0.004
         self.chamber_kd = ctuning.get('kd', 0.0)
         self.chamber_sample_time = ctuning.get('sample_time', 15)
 
@@ -165,6 +165,7 @@ class gMiddle(tk.Frame):
 
     def settings(self):
         try:
+            self.beer_target -= 2.0
             logging.info('settings')
         except Exception as e:
             logging.exception("settings %s %s", type(e), e)

@@ -2,6 +2,8 @@
 Description=Brewferm Sensors Controller
 
 [Service]
+User=pi
+Group=pi
 ExecStart=/bin/bash -c '/usr/bin/python3 /home/pi/brewferm/sensors.py > /home/pi/brewferm/logs/sensors.log 2>&1'
 Restart=always
 RestartSec=30s

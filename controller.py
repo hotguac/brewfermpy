@@ -22,38 +22,37 @@ class BrewfermController():
 
         self.xd = XchgData(paths.controller_out)
 
-        self.beer_temp = self.xd.get('beer')
         self.beer_target = self.xd.get('target')
-        self.beer_tuning = self.xd.get('beer_pid')
-
         self.chamber_temp = self.xd.get('chamber')
+        if (self.chamber_temp is None) or (self.beer_target is None):
+            logging.info('not ready yet, exiting')
+            sys.exit(0)
+
+        self.beer_temp = self.xd.get('beer')
+        self.beer_tuning = self.xd.get('beer_pid')
         self.chamber_tuning = self.xd.get('chamber_pid')
 
-        self.current_state = self.xd.get('current', paths.paused)
         self.desired_state = paths.idle
 
         self.beerPID = BeerPID(self.beer_target)
         self.beerPID.set_tuning(self.beer_tuning)
         self.beerPID.pid._last_output = self.beer_target
         self.beerPID.pid._integral = self.beer_target
-        
+
         self.chamberPID = ChamberPID(self.beer_target)
         self.chamberPID.set_tuning(self.chamber_tuning)
         self.chamberPID.pid._last_output = 50
         self.chamberPID.pid._integral = 50
 
         self.last_output = datetime.now() - timedelta(minutes=3)
-        self.last_chamber = self.beer_target
 
     def calculate(self):
         try:
             if self.beer_target != self.beerPID.pid.setpoint:
-                self.beerPID.pid.setpoint = self.beer_target
+                self.beerPID.change_target(self.beer_target)
 
             x = self.beerPID.update(self.beer_temp)
-            if abs(x - self.last_chamber) > 0.1:
-                self.chamberPID.pid.setpoint = x
-                self.last_chamber = x
+            self.chamberPID.pid.setpoint = x
 
             self.heat_cool = self.chamberPID.update(float(self.chamber_temp))
             ckp, cki, ckd = self.chamberPID.pid.components
@@ -63,8 +62,8 @@ class BrewfermController():
             if ts > (self.last_output + timedelta(minutes=2)):
                 self.last_output = ts
                 logging.debug(
-                    ' beer = %.1f / %.1f / %.1f %s / '
-                    ' chamber = %.1f / %.1f / %.1f / %.1f %s',
+                    ' beer = %.1f / %.1f / %.1f %s / %s '
+                    ' chamber = %.1f / %.1f / %.1f / %.1f %s / %s',
                     round(self.beer_temp, 2),
                     round(self.beerPID.pid.setpoint),
                     round(bki, 1),
@@ -72,6 +71,7 @@ class BrewfermController():
                         self.beerPID.pid.tunings[0],
                         self.beerPID.pid.tunings[1]
                     ),
+                    round(self.beerPID.pid.sample_time,1),
                     round(self.chamber_temp, 2),
                     round(x, 1),
                     round(self.heat_cool, 2),
@@ -79,7 +79,8 @@ class BrewfermController():
                     (
                         self.chamberPID.pid.tunings[0],
                         self.chamberPID.pid.tunings[1]
-                    )
+                    ),
+                    round(self.chamberPID.pid.sample_time,1)
                 )
         except Exception as e:
             logging.exception("%s %s", type(e), e)
@@ -94,7 +95,6 @@ class BrewfermController():
         self.beer_temp = self.xd.get('beer')
         self.chamber_temp = self.xd.get('chamber')
         self.beer_target = self.xd.get('target')
-        self.current_state = self.xd.get('current')
 
         if self.xd.get('paused_state', paths.paused) == paths.paused:
             self.desired_state = paths.paused
@@ -122,7 +122,8 @@ class BrewfermController():
                     'old beer tuning %s vs new %s',
                     beertuning,
                     self.beer_tuning)
-                self.beerPID.set_tuning(self.beer_tuning)
+                self.beer_tuning = beer_tuning
+                self.beerPID.set_tuning(beer_tuning)
 
             if chambertuning != self.chamber_tuning:
                 logging.debug(

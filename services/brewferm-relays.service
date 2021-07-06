@@ -3,6 +3,8 @@ Description=Brewferm Relays Controller
 After=brewferm-sensors.service
 
 [Service]
+User=pi
+Group=pi
 ExecStart=/bin/bash -c '/usr/bin/python3 /home/pi/brewferm/relays.py > /home/pi/brewferm/logs/relays.log 2>&1'
 Restart=always
 RestartSec=30s

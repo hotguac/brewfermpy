@@ -6,7 +6,7 @@ import os
 import random
 import sys
 
-from datetime import timedelta, datetime
+from datetime import datetime
 from time import sleep
 
 # Import application libraries ------------------------------------------------
@@ -23,12 +23,14 @@ class BrewfermSensors:
         self.current_reading = {}
         self.sleep_time = 4  # seconds
 
-        self.heat_rate = 12.0 / (60 * 60)  # degrees F per second empty chamber
-        self.cool_rate = 60.0 / (60 * 60)  # degrees F per second empty chamber
+        # degrees F per second empty chamber
+        self.heat_rate = 12.0 / (60 * 60)
+        self.cool_rate = 60.0 / (60 * 60)
 
-        self.chamber_to_beer = 0.3 / (60 * 60)  # degrees F per second per degree difference
-        self.beer_to_chamber = 1.4 / (60 * 60)  # degrees F per second per degree difference
-        self.ambient_to_chamber = 0.05 / (60 * 60)  # degrees F per second per degree difference
+        # degrees F per second per degree difference
+        self.chamber_to_beer = 0.3 / (60 * 60)
+        self.beer_to_chamber = 1.4 / (60 * 60)
+        self.ambient_to_chamber = 0.05 / (60 * 60)
 
     def sleep_for(self):
         return self.sleep_time
@@ -42,7 +44,7 @@ class BrewfermSensors:
 # TODO: Make all rates time based and use the time between calls
     def emulate_temps(self):
         ambient = 80  # degrees F
-        
+
         beer = self.xd.get('beer', 64)
         chamber = self.xd.get('chamber', 64)
         current = self.xd.get('current', paths.idle)
@@ -52,12 +54,10 @@ class BrewfermSensors:
         self.last_emulation = check_time
 
         elapsed_seconds = (
-            (elapsed.days * 24 * 60 * 60) 
+            (elapsed.days * 24 * 60 * 60)
             + elapsed.seconds
             + (elapsed.microseconds / 1000000)
         )
-
-        #logging.debug('elapsed = %s and elapsed_seconds = %s', elapsed, elapsed_seconds)
 
         if elapsed_seconds < (self.sleep_time * 3):
             if current == paths.heat:
@@ -66,8 +66,14 @@ class BrewfermSensors:
                 chamber -= elapsed_seconds * self.cool_rate  # 0.15
 
             beer += (chamber - beer) * (elapsed_seconds * self.chamber_to_beer)
-            chamber += (beer - chamber) * (elapsed_seconds * self.beer_to_chamber)
-            chamber += (ambient - chamber) * (elapsed_seconds * self.ambient_to_chamber)
+            chamber += (
+                (beer - chamber) * (elapsed_seconds * self.beer_to_chamber)
+            )
+
+            chamber += (
+                (ambient - chamber)
+                * (elapsed_seconds * self.ambient_to_chamber)
+            )
 
         result = {}
         result['sensor1'] = beer

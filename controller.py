@@ -22,15 +22,15 @@ class BrewfermController():
 
         self.xd = XchgData(paths.controller_out)
 
-        self.beer_target = self.xd.get('target')
-        self.chamber_temp = self.xd.get('chamber')
+        self.beer_target = self.xd.get(paths.beer_target)
+        self.chamber_temp = self.xd.get(paths.chamber_temp)
         if (self.chamber_temp is None) or (self.beer_target is None):
             logging.info('not ready yet, exiting')
             sys.exit(0)
 
-        self.beer_temp = self.xd.get('beer')
-        self.beer_tuning = self.xd.get('beer_pid')
-        self.chamber_tuning = self.xd.get('chamber_pid')
+        self.beer_temp = self.xd.get(paths.beer_temp)
+        self.beer_tuning = self.xd.get(paths.beerPID)
+        self.chamber_tuning = self.xd.get(paths.chamberPID)
 
         self.desired_state = paths.idle
 
@@ -92,11 +92,11 @@ class BrewfermController():
             logging.exception("%s %s", type(e), e)
 
     def update(self):
-        self.beer_temp = self.xd.get('beer')
-        self.chamber_temp = self.xd.get('chamber')
-        self.beer_target = self.xd.get('target')
+        self.beer_temp = self.xd.get(paths.beer_temp)
+        self.chamber_temp = self.xd.get(paths.chamber_temp)
+        self.beer_target = self.xd.get(paths.beer_target)
 
-        if self.xd.get('paused_state', paths.paused) == paths.paused:
+        if self.xd.get(paths.state, paths.paused) == paths.paused:
             self.desired_state = paths.paused
         else:
             self.calculate()
@@ -107,8 +107,8 @@ class BrewfermController():
             if self.heat_cool < 20:
                 self.desired_state = paths.cool
 
-        beertuning = self.xd.get('beer_pid')
-        chambertuning = self.xd.get('chamber_pid')
+        beertuning = self.xd.get(paths.beerPID)
+        chambertuning = self.xd.get(paths.chamberPID)
 
         if (beertuning is None) or (chambertuning is None):
             logging.debug(

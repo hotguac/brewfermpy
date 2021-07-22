@@ -119,7 +119,7 @@ class BrewfermRelays:
 
     def update(self):
         try:
-            self.desired_state = self.xd.get('desired', default=paths.idle)
+            self.desired_state = self.xd.get(paths.desired, default=paths.idle)
 
             expired = (datetime.now() - timedelta(minutes=20))
             self.desired_ts = self.xd.get(

@@ -47,22 +47,23 @@ class XchgData():
     def get(self, field_name, default=None):
         try:
             switcher = {
-                'current': lambda: self.get_relays(field_name),
+                paths.current: lambda: self.get_relays(field_name),
                 'relays_ts': lambda: self.get_relays('ts'),
-                'desired': lambda: self.get_controller(field_name),
+                paths.desired: lambda: self.get_controller(field_name),
                 'desired_ts': lambda: self.get_controller('ts'),
-                'chamber': lambda: self.get_temp('chamber'),
-                'beer': lambda: self.get_temp('beer'),
-                'target': lambda: self.get_gui('beer_target'),
-                'beer_pid': lambda: self.get_gui('beer_pid'),
-                'chamber_pid': lambda: self.get_gui('chamber_pid'),
-                'paused_state': lambda: self.get_gui('state'),
+                paths.chamber_temp: lambda: self.get_temp('chamber'),
+                paths.beer_temp: lambda: self.get_temp('beer'),
+                paths.beer_target: lambda: self.get_gui('beer_target'),
+                paths.beerPID: lambda: self.get_gui('beer_pid'),
+                paths.chamberPID: lambda: self.get_gui('chamber_pid'),
+                paths.state: lambda: self.get_gui('state'),
                 'sensor_map': lambda: self.get_gui('id_map')
             }
 
             result = switcher.get(field_name)  # returns a function object
             if result:
                 x = result()
+                #logging.debug('xd get: %s %s', field_name, x)
                 if x:
                     return result()  # execute the lambda expression function
                 else:

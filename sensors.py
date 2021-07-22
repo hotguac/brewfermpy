@@ -45,9 +45,9 @@ class BrewfermSensors:
     def emulate_temps(self):
         ambient = 80  # degrees F
 
-        beer = self.xd.get('beer', 64)
-        chamber = self.xd.get('chamber', 64)
-        current = self.xd.get('current', paths.idle)
+        beer = self.xd.get(paths.beer_temp, 64)
+        chamber = self.xd.get(paths.chamber_temp, 64)
+        current = self.xd.get(paths.current, paths.idle)
 
         check_time = datetime.now()
         elapsed = check_time - self.last_emulation

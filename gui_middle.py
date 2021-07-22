@@ -24,8 +24,8 @@ class gBeerTemps(tk.Frame):
 
         self.xd = XchgData()  # read only for now
 
-        self.beer_temp = self.xd.get('beer', 64.0)
-        self.beer_target = self.xd.get('target', 64.0)
+        self.beer_temp = self.xd.get(paths.beer_temp, 64.0)
+        self.beer_target = self.xd.get(paths.beer_target, 64.0)
 
         self.create_widgets()
         self.update_temps()
@@ -33,8 +33,8 @@ class gBeerTemps(tk.Frame):
     def update_temps(self):
         try:
             self.after(1000, self.update_temps)
-            self.beer_temp = self.xd.get('beer', 64)
-            self.beer_target = self.xd.get('target', 64)
+            self.beer_temp = self.xd.get(paths.beer_temp, 64)
+            self.beer_target = self.xd.get(paths.beer_target, 64)
 
             self.current['text'] = str(round(self.beer_temp))
             self.target['text'] = str(round(self.beer_target))
@@ -67,18 +67,18 @@ class gMiddle(tk.Frame):
 
         self.xd = XchgData(paths.gui_out)
 
-        self.beer_temp = self.xd.get('beer', 69.0)
-        self.beer_target = self.xd.get('target', 69.0)
-        self.state = self.xd.get('paused_state', paths.running)
+        self.beer_temp = self.xd.get(paths.beer_temp, 69.0)
+        self.beer_target = self.xd.get(paths.beer_target, 89.0)
+        self.state = self.xd.get(paths.state, paths.running)
 
-        btuning = self.xd.get('beer_pid', {})
+        btuning = self.xd.get(paths.beerPID, {})
 
         self.beer_kp = btuning.get('kp', 8.0)
         self.beer_ki = btuning.get('ki', 0.0015)  # 0.0001
         self.beer_kd = btuning.get('kd', 0.0)
         self.beer_sample_time = btuning.get('sample_time', 60)
 
-        ctuning = self.xd.get('chamber_pid', {})
+        ctuning = self.xd.get(paths.chamberPID, {})
 
         self.chamber_kp = ctuning.get('kp', 6.0)  # 6.0
         self.chamber_ki = ctuning.get('ki', 0.004)  # 0.004
@@ -137,8 +137,8 @@ class gMiddle(tk.Frame):
         x['relays'] = self.relays
 
         self.id_map = {
-            'sensor1': 'beer',
-            'sensor2': 'chamber'
+            '28-00000b812382': 'beer',
+            '28-000008802d75': 'chamber'
         }
 
         x['id_map'] = self.id_map

@@ -19,8 +19,9 @@ from xchg import XchgData
 
 # Classes ------------------------------------------------------------
 class BrewfermRelays:
-    def __init__(self, pin_number):
-        self.pin = pin_number
+    def __init__(self, cool_pin, heat_pin):
+        self.cool_pin = cool_pin
+        self.heat_pin = heat_pin
         self.setup_gpio()
         self.sleep_time = 2
         self.timeout = False
@@ -46,8 +47,10 @@ class BrewfermRelays:
     def setup_gpio(self):
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(18, GPIO.OUT)
-        GPIO.output(18, GPIO.HIGH)
+        GPIO.setup(self.cool_pin, GPIO.OUT)
+        GPIO.output(self.cool_pin, GPIO.LOW)
+        GPIO.setup(self.heat_pin, GPIO.OUT)
+        GPIO.output(self.heat_pin, GPIO.LOW)
         GPIO.setwarnings(True)
 
     def gpio_cleanup(self):
@@ -153,9 +156,20 @@ class BrewfermRelays:
 
     def post_current(self):
         try:
+            if self.current_state == paths.heat:
+                GPIO.output(self.cool_pin, GPIO.LOW)
+                GPIO.output(self.heat_pin, GPIO.HIGH)
+            if self.current_state == paths.cool:
+                GPIO.output(self.heat_pin, GPIO.LOW)
+                GPIO.output(self.cool_pin, GPIO.HIGH)
+            if self.current_state == paths.idle:
+                GPIO.output(self.heat_pin, GPIO.LOW)
+                GPIO.output(self.cool_pin, GPIO.LOW)
+
             self.xd.write_relays({"current": self.current_state})
         except Exception as e:
             logging.exception('%s %s', type(e), e)
+            sys.exit(1)
 
 
 # main loop here
@@ -168,7 +182,7 @@ if __name__ == '__main__':
                 '-%(levelname)s-%(message)s'))
 
         logging.info("relays starting up")
-        myrelays = BrewfermRelays(18)  # BCM pin 18
+        myrelays = BrewfermRelays(12, 16)  # BCM pin 18
 
         atexit.register(myrelays.gpio_cleanup)
 

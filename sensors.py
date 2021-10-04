@@ -112,7 +112,7 @@ class BrewfermSensors:
                 for candidate in possible:
                     t1 = self.gettemp(candidate.name)
                     if t1 is not None:
-                        #logging.info('found %s', candidate.name)
+                        # logging.info('found %s', candidate.name)
                         temp_f = (float(t1) * 9.0) / 5000 + 32.0
                         self.current_reading[candidate.name] = temp_f
         except Exception as e:
@@ -131,7 +131,7 @@ class BrewfermSensors:
 
             if crc == 'YES':
                 line = f.readline()  # read 2nd line
-                #logging.debug('line2=%s', line)
+                # logging.debug('line2=%s', line)
                 mytemp = line.rsplit('t=', 1)[1]
             else:
                 mytemp = None
@@ -142,6 +142,8 @@ class BrewfermSensors:
             return mytemp
         except FileNotFoundError:
             # not everything in the directory is a one-wire temp sensor
+            return None
+        except IndexError:
             return None
         except Exception as e:
             logging.exception(

@@ -38,7 +38,7 @@ class BrewfermRelays:
         self.desired_state = None
 
         self.off_on = 6  # minutes
-        self.max_on = 5  # minutes
+        self.max_on = 7  # minutes
         self.min_on = 1  # minutes
 
         self.hc_balance = 6  # multiply times for heat

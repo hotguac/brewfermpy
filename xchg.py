@@ -63,7 +63,6 @@ class XchgData():
             result = switcher.get(field_name)  # returns a function object
             if result:
                 x = result()
-                #logging.debug('xd get: %s %s', field_name, x)
                 if x:
                     return result()  # execute the lambda expression function
                 else:

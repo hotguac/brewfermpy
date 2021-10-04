@@ -85,7 +85,7 @@ class gMiddle(tk.Frame):
         self.chamber_kd = ctuning.get('kd', 0.0)
         self.chamber_sample_time = ctuning.get('sample_time', 15)
 
-        self.relays_off_on = 6  # minutes - give compressor time
+        self.relays_off_on = 6  # minutes - give compressor time, no lower than 6
         self.relays_max_on = 6  # minutes
         self.relays_hc_balance = 2.0
         self.relays_zone_size = 20  # 0-20 cool ; 80-100 heat
@@ -127,7 +127,7 @@ class gMiddle(tk.Frame):
 
         x['chamber_pid'] = self.chamber_pid
 
-        self.relays = {
+        self.relays = { #TODO: determine if these are the correct values !!!
             'off_on': self.relays_off_on,
             'max_on': self.relays_max_on,
             'hc_balance': self.relays_hc_balance,
@@ -136,7 +136,7 @@ class gMiddle(tk.Frame):
 
         x['relays'] = self.relays
 
-        self.id_map = {
+        self.id_map = {  #TODO: user configure, default to sort order
             '28-00000b812382': 'beer',
             '28-000008802d75': 'chamber'
         }

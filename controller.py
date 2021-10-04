@@ -71,7 +71,7 @@ class BrewfermController():
                         self.beerPID.pid.tunings[0],
                         self.beerPID.pid.tunings[1]
                     ),
-                    round(self.beerPID.pid.sample_time,1),
+                    round(self.beerPID.pid.sample_time, 1),
                     round(self.chamber_temp, 2),
                     round(x, 1),
                     round(self.heat_cool, 2),
@@ -80,7 +80,7 @@ class BrewfermController():
                         self.chamberPID.pid.tunings[0],
                         self.chamberPID.pid.tunings[1]
                     ),
-                    round(self.chamberPID.pid.sample_time,1)
+                    round(self.chamberPID.pid.sample_time, 1)
                 )
         except Exception as e:
             logging.exception("%s %s", type(e), e)
@@ -111,23 +111,18 @@ class BrewfermController():
         chambertuning = self.xd.get(paths.chamberPID)
 
         if (beertuning is None) or (chambertuning is None):
-            logging.debug(
-                'beertuning = % s and chamber tuning = %s',
-                beertuning,
-                chambertuning)
+            logging.debug('beertuning = %s and chamber tuning = %s', beertuning, chambertuning)
             self.desired_state = paths.paused
         else:
             if beertuning != self.beer_tuning:
-                logging.debug(
-                    'old beer tuning %s vs new %s',
+                logging.debug('old beer tuning %s vs new %s',
                     beertuning,
                     self.beer_tuning)
-                self.beer_tuning = beer_tuning
-                self.beerPID.set_tuning(beer_tuning)
+                self.beer_tuning = beertuning
+                self.beerPID.set_tuning(self.beer_tuning)
 
             if chambertuning != self.chamber_tuning:
-                logging.debug(
-                    'old chamber tuning %s vs new %s',
+                logging.debug('old chamber tuning %s vs new %s',
                     chambertuning,
                     self.chamber_tuning)
                 self.chamberPID.set_tuning(self.chamber_tuning)

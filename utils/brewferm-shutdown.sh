@@ -1,4 +1,3 @@
-sudo systemctl start brewferm-controller.service
 sudo systemctl stop brewferm-controller.service
 sudo systemctl kill brewferm-controller.service
 sudo systemctl stop brewferm-sensors.service

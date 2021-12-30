@@ -183,6 +183,7 @@ if __name__ == '__main__':
 
         logging.info("relays starting up")
         myrelays = BrewfermRelays(12, 16)  # BCM pin 18
+        # myrelays = BrewfermRelays(16, 12)  # BCM pin 18
 
         atexit.register(myrelays.gpio_cleanup)
 

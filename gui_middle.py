@@ -25,7 +25,9 @@ class gBeerTemps(tk.Frame):
         self.xd = XchgData()  # read only for now
 
         self.beer_temp = self.xd.get(paths.beer_temp, 64.0)
-        self.beer_target = self.xd.get(paths.beer_target, 64.0)
+
+        # This 64.0 get overriden by
+        self.beer_target = self.xd.get(paths.beer_target, 64.1)
 
         self.create_widgets()
         self.update_temps()
@@ -34,7 +36,7 @@ class gBeerTemps(tk.Frame):
         try:
             self.after(1000, self.update_temps)
             self.beer_temp = self.xd.get(paths.beer_temp, 64)
-            self.beer_target = self.xd.get(paths.beer_target, 64)
+            self.beer_target = self.xd.get(paths.beer_target, 64.2)
 
             self.current['text'] = str(round(self.beer_temp))
             self.target['text'] = str(round(self.beer_target))
@@ -68,7 +70,9 @@ class gMiddle(tk.Frame):
         self.xd = XchgData(paths.gui_out)
 
         self.beer_temp = self.xd.get(paths.beer_temp, 69.0)
-        self.beer_target = self.xd.get(paths.beer_target, 89.0)
+
+        # This will set the default if no gui_out.mmap exists !!!!
+        self.beer_target = self.xd.get(paths.beer_target, 65.0)
         self.state = self.xd.get(paths.state, paths.running)
 
         btuning = self.xd.get(paths.beerPID, {})
@@ -85,7 +89,7 @@ class gMiddle(tk.Frame):
         self.chamber_kd = ctuning.get('kd', 0.0)
         self.chamber_sample_time = ctuning.get('sample_time', 15)
 
-        self.relays_off_on = 6  # minutes - give compressor time, no lower than 6
+        self.relays_off_on = 6  # minutes - minimum of 6 for safety
         self.relays_max_on = 6  # minutes
         self.relays_hc_balance = 2.0
         self.relays_zone_size = 20  # 0-20 cool ; 80-100 heat
@@ -127,7 +131,7 @@ class gMiddle(tk.Frame):
 
         x['chamber_pid'] = self.chamber_pid
 
-        self.relays = { #TODO: determine if these are the correct values !!!
+        self.relays = {
             'off_on': self.relays_off_on,
             'max_on': self.relays_max_on,
             'hc_balance': self.relays_hc_balance,
@@ -136,7 +140,7 @@ class gMiddle(tk.Frame):
 
         x['relays'] = self.relays
 
-        self.id_map = {  #TODO: user configure, default to sort order
+        self.id_map = {  # TODO: user configure
             '28-00000b812382': 'beer',
             '28-000008802d75': 'chamber'
         }

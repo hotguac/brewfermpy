@@ -21,7 +21,7 @@ class BeerPID:
 
         self.setpoint = setpoint
 
-        low_limit = setpoint - 6
+        low_limit = setpoint - 20
         if low_limit < 34:
             low_limit = 34
 
@@ -38,6 +38,22 @@ class BeerPID:
             setpoint=self.setpoint)
 
     def update(self, current_temp):
+        # TODO: refactor the limits from here, init, and change_target
+        if (current_temp - self.setpoint) > 2:
+            low_limit = self.setpoint - 20
+            if low_limit < 34:
+                low_limit = 34
+        else:
+            old_low = self.pid.output_limits[0]
+            low_limit = ((self.setpoint - 8) + (old_low * 89)) / 90
+
+            if low_limit < 34:
+                low_limit = 34
+
+        high_limit = self.pid.output_limits[1]
+        self.pid.output_limits = low_limit, high_limit
+
+        # logging.info('current = %s limits = %s', current_temp, self.pid.output_limits)
         return self.pid(current_temp)
 
     def change_target(self, setpoint):

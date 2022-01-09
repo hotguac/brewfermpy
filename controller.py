@@ -48,8 +48,10 @@ class BrewfermController():
 
     def calculate(self):
         try:
-            if self.beer_target != self.beerPID.pid.setpoint:
-                self.beerPID.change_target(self.beer_target)
+            beer_target = self.xd.get(paths.beer_target)
+
+            if beer_target != self.beerPID.pid.setpoint:
+                self.beerPID.change_target(beer_target)
 
             x = self.beerPID.update(self.beer_temp)
             self.chamberPID.pid.setpoint = x
@@ -94,7 +96,6 @@ class BrewfermController():
     def update(self):
         self.beer_temp = self.xd.get(paths.beer_temp)
         self.chamber_temp = self.xd.get(paths.chamber_temp)
-        self.beer_target = self.xd.get(paths.beer_target)
 
         if self.xd.get(paths.state, paths.paused) == paths.paused:
             self.desired_state = paths.paused

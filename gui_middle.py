@@ -24,38 +24,136 @@ class gBeerTemps(tk.Frame):
 
         self.xd = XchgData()  # read only for now
 
-        self.beer_temp = self.xd.get(paths.beer_temp, 64.0)
-
-        # This 64.0 get overriden by
-        self.beer_target = self.xd.get(paths.beer_target, 64.1)
-
         self.create_widgets()
         self.update_temps()
 
+    def create_widgets(self):
+        self.current = tk.Label(self.master.values_box, 
+            text="??",
+            background = colors.background,
+            fg = colors.normal50,
+            font = ("Arial", -180)
+            )
+
+        self.target = tk.Label(self.master.values_box, 
+            text="??",
+            background = colors.background,
+            fg = colors.normal50,
+            font = ("Arial", -80)
+            )
+
+        self.button_font = font.Font(family="Arial", size=-60, weight="bold")
+
+        self.warmer = tk.Button(
+            self.master.values_box,
+            text="+",
+            command=self.plus_one,
+            foreground=colors.background,
+            background=colors.normal50,
+            borderwidth=0,
+            highlightthickness=0,
+            font=self.button_font,
+            activebackground=colors.normal_button,
+            highlightbackground=colors.normal_button,
+            highlightcolor=colors.normal_button,
+            relief=tk.FLAT
+            )
+
+        self.warmer10 = tk.Button(
+            self.master.values_box,
+            text="10",
+            command=self.plus_ten,
+            foreground=colors.background,
+            background=colors.normal50,
+            borderwidth=0,
+            highlightthickness=0,
+            font=self.button_font,
+            activebackground=colors.normal_button,
+            highlightbackground=colors.normal_button,
+            highlightcolor=colors.normal_button,
+            relief=tk.FLAT
+            )
+
+        self.colder = tk.Button(
+            self.master.values_box,
+            text="-",
+            command=self.minus_one,
+            foreground=colors.background,
+            background=colors.normal50,
+            borderwidth=0,
+            highlightthickness=0,
+            font=self.button_font,
+            activebackground=colors.normal_button,
+            highlightbackground=colors.normal_button,
+            highlightcolor=colors.normal_button,
+            relief=tk.FLAT
+            )
+
+        self.colder10 = tk.Button(
+            self.master.values_box,
+            text="10",
+            command=self.minus_ten,
+            foreground=colors.background,
+            background=colors.normal50,
+            borderwidth=0,
+            highlightthickness=0,
+            font=self.button_font,
+            activebackground=colors.normal_button,
+            highlightbackground=colors.normal_button,
+            highlightcolor=colors.normal_button,
+            relief=tk.FLAT
+            )
+
     def update_temps(self):
         try:
-            self.after(1000, self.update_temps)
-            self.beer_temp = self.xd.get(paths.beer_temp, 64)
-            self.beer_target = self.xd.get(paths.beer_target, 64.2)
+            self.after(500, self.update_temps)
+            
+            beer_temp = self.xd.get(paths.beer_temp)
+            if beer_temp is None:
+                self.current['text'] = '??'
+            else:
+                self.current['text'] = str(round(beer_temp))
 
-            self.current['text'] = str(round(self.beer_temp))
-            self.target['text'] = str(round(self.beer_target))
+            beer_target = self.xd.get(paths.beer_target)
+            if beer_target is None:
+                self.target['text'] = '??'
+            else:
+                self.target['text'] = str(round(beer_target))
+
         except Exception as e:
             logging.exception("%s %s", type(e), e)
 
-    def create_widgets(self):
-        self.current = tk.Label(self.master.values_box, text="64")
-        self.current["bg"] = colors.background
-        self.current["fg"] = colors.normal50
-        self.current["font"] = ("Arial", -180)
+    def plus_one(self):
+        self.master.beer_target += 1.0
+
+    def plus_ten(self):
+        self.master.beer_target += 10.0
+
+    def minus_one(self):
+        self.master.beer_target -= 1.0
+
+    def minus_ten(self):
+        self.master.beer_target -= 10.0
+
+    def show_beer(self):
+        self.warmer.place(x=0, y=0, height=0, width=0)
+        self.warmer10.place(x=0, y=0, height=0, width=0)
+        self.colder.place(x=0, y=0, height=0, width=0)
+        self.colder10.place(x=0, y=0, height=0, width=0)
+
         self.current.place(x=160, y=80, height=200, width=240)
 
-        self.target = tk.Label(self.master.values_box, text="64")
-        self.target["bg"] = colors.background
-        self.target["fg"] = colors.normal50
-        self.target["font"] = ("Arial", -80)
         self.target.place(x=580, y=120, height=100, width=160)
 
+    def show_target(self):
+        self.current.place(x=160, y=80, height=0, width=0)
+
+        self.warmer.place(x=160, y=80, height=80, width=80)
+        self.colder.place(x=160, y=180, height=80, width=80)
+        self.warmer10.place(x=260, y=80, height=80, width=100)
+        self.colder10.place(x=260, y=180, height=80, width=100)
+
+        self.target.place(x=580, y=120, height=100, width=160)
 
 # ------------------------------------------------
 # Middle section of screen
@@ -72,7 +170,7 @@ class gMiddle(tk.Frame):
         self.beer_temp = self.xd.get(paths.beer_temp, 69.0)
 
         # This will set the default if no gui_out.mmap exists !!!!
-        self.beer_target = self.xd.get(paths.beer_target, 65.0)
+        self.beer_target = self.xd.get(paths.beer_target, 75.0)
         self.state = self.xd.get(paths.state, paths.running)
 
         btuning = self.xd.get(paths.beerPID, {})
@@ -96,83 +194,6 @@ class gMiddle(tk.Frame):
 
         self.create_widgets()
         self.after(1000, self.update_out)
-
-    def update_out(self):
-        try:
-            self.after(2000, self.update_out)
-
-            if self.btemps is None:
-                self.btemps = gBeerTemps(master=self)
-
-            self.xd.write_gui(self.format_state())
-        except Exception as e:
-            logging.exception('%s %s', type(e), e)
-
-    def format_state(self):
-        x = {}
-        x[paths.beer_target] = self.beer_target
-        x[paths.state] = self.state
-
-        self.beer_pid = {
-            'kp': self.beer_kp,
-            'ki': self.beer_ki,
-            'kd': self.beer_kd,
-            'sample_time': self.beer_sample_time
-            }
-
-        x['beer_pid'] = self.beer_pid
-
-        self.chamber_pid = {
-            'kp': self.chamber_kp,
-            'ki': self.chamber_ki,
-            'kd': self.chamber_kd,
-            'sample_time': self.chamber_sample_time
-            }
-
-        x['chamber_pid'] = self.chamber_pid
-
-        self.relays = {
-            'off_on': self.relays_off_on,
-            'max_on': self.relays_max_on,
-            'hc_balance': self.relays_hc_balance,
-            'zone_size': self.relays_zone_size
-        }
-
-        x['relays'] = self.relays
-
-        self.id_map = {  # TODO: user configure
-            '28-00000b812382': 'beer',
-            '28-000008802d75': 'chamber'
-        }
-
-        x['id_map'] = self.id_map
-
-        return x
-
-    def pause_brew(self):
-        try:
-            if self.pause_button['text'] == "Pause":
-                logging.warning("brewing paused...")
-                self.state = paths.paused
-                self.pause_button['text'] = "Resume"
-            else:
-                logging.info("brewing resumeed...")
-                self.pause_button['text'] = "Pause"
-                self.state = paths.running
-
-        except Exception as e:
-            logging.exception(e)
-
-    def exit_brew(self):
-        logging.info("exiting gui")
-        self.master.destroy()
-
-    def settings(self):
-        try:
-            self.beer_target -= 2.0
-            logging.info('settings')
-        except Exception as e:
-            logging.exception("settings %s %s", type(e), e)
 
     def create_widgets(self):
         self.values_box = tk.Frame(self.master)
@@ -267,3 +288,81 @@ class gMiddle(tk.Frame):
         self.lbl_target["fg"] = colors.invert_text
         self.lbl_target["font"] = ("Arial", -24)
         self.lbl_target.place(x=580, y=0, height=40, width=160)
+
+    def update_out(self):
+        try:
+            self.after(500, self.update_out)
+
+            if self.btemps is None:
+                self.btemps = gBeerTemps(master=self)
+                self.btemps.show_beer()
+
+            self.xd.write_gui(self.format_state())
+        except Exception as e:
+            logging.exception('%s %s', type(e), e)
+
+    def format_state(self):
+        x = {}
+        x[paths.beer_target] = self.beer_target
+        x[paths.state] = self.state
+
+        x['beer_pid'] = {
+            'kp': self.beer_kp,
+            'ki': self.beer_ki,
+            'kd': self.beer_kd,
+            'sample_time': self.beer_sample_time
+            }
+
+        x['chamber_pid'] = {
+            'kp': self.chamber_kp,
+            'ki': self.chamber_ki,
+            'kd': self.chamber_kd,
+            'sample_time': self.chamber_sample_time
+            }
+
+        x['relays'] = {
+            'off_on': self.relays_off_on,
+            'max_on': self.relays_max_on,
+            'hc_balance': self.relays_hc_balance,
+            'zone_size': self.relays_zone_size
+        }
+
+        x['id_map'] = {  # TODO: user configure
+            '28-00000b812382': 'beer',
+            '28-000008802d75': 'chamber'
+        }
+
+        return x
+
+    def pause_brew(self):
+        try:
+            if self.pause_button['text'] == "Pause":
+                logging.warning("brewing paused...")
+                self.state = paths.paused
+                self.pause_button['text'] = "Resume"
+            else:
+                logging.info("brewing resumeed...")
+                self.pause_button['text'] = "Pause"
+                self.state = paths.running
+
+        except Exception as e:
+            logging.exception(e)
+
+    def exit_brew(self):
+        logging.info("exiting gui")
+        self.master.destroy()
+
+    def settings(self):
+        try:
+            if self.settings_button['text'] == "Settings":
+                self.settings_button['text'] = "Back"
+                self.btemps.show_target()
+            else:
+                if self.settings_button['text'] == "Back":
+                    self.settings_button['text'] = "Settings"
+                    self.btemps.show_beer()
+
+            logging.info('settings')
+        except Exception as e:
+            logging.exception("settings %s %s", type(e), e)
+

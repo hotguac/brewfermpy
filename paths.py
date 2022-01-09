@@ -27,3 +27,5 @@ heat = 'Heat'
 state = 'state'
 running = 'running'
 paused = 'paused'
+
+default_beer_target = 64

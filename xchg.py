@@ -89,6 +89,7 @@ class XchgData():
 
     def get_gui(self, field_name):
         result = None
+
         try:
             if self.gui_out is None:
                 self.gui_out = Xchg(paths.gui_out, self.gui_mode)
@@ -97,7 +98,6 @@ class XchgData():
             if x is None:
                 x = {}
 
-            result = None
             if field_name in x.keys():
                 result = x[field_name]
         except Exception as e:
@@ -258,9 +258,13 @@ class Xchg():
                 self.mmap_file = open(self.path, "r+")
                 self.mm = mmap.mmap(self.mmap_file.fileno(), 0)
 
+            self.mm.flush()
             self.mm.seek(0)
             s = self.mm.readline()
             self.last = json.loads(s.decode('utf-8'))
+
+            #self.mmap_file.close()
+            #self.mmap_file = None
             return self.last
         except ValueError:
             if self.last_warning_ts < (datetime.now() - timedelta(minutes=5)):

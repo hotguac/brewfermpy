@@ -3,10 +3,8 @@
 # Import standard libraries ---------------------------------------------------
 import logging
 import os
-import random
 import sys
 
-from datetime import datetime
 from time import sleep
 
 # Import application libraries ------------------------------------------------
@@ -19,18 +17,8 @@ from xchg import XchgData
 class BrewfermSensors:
     def __init__(self):
         self.xd = XchgData(paths.sensors_out)
-        self.last_emulation = datetime.now()
         self.current_reading = {}
         self.sleep_time = 4  # seconds
-
-        # degrees F per second empty chamber
-        self.heat_rate = 12.0 / (60 * 60)
-        self.cool_rate = 60.0 / (60 * 60)
-
-        # degrees F per second per degree difference
-        self.chamber_to_beer = 0.3 / (60 * 60)
-        self.beer_to_chamber = 1.4 / (60 * 60)
-        self.ambient_to_chamber = 0.05 / (60 * 60)
 
     def sleep_for(self):
         return self.sleep_time
@@ -40,47 +28,6 @@ class BrewfermSensors:
             self.id_map = self.xd.get('sensor_map', {})
         except Exception as e:
             logging.exception('update_mapping %s %s', type(e), e)
-
-# TODO: Make all rates time based and use the time between calls
-    def emulate_temps(self):
-        ambient = 80  # degrees F
-
-        beer = self.xd.get(paths.beer_temp, 64)
-        chamber = self.xd.get(paths.chamber_temp, 64)
-        current = self.xd.get(paths.current, paths.idle)
-
-        check_time = datetime.now()
-        elapsed = check_time - self.last_emulation
-        self.last_emulation = check_time
-
-        elapsed_seconds = (
-            (elapsed.days * 24 * 60 * 60)
-            + elapsed.seconds
-            + (elapsed.microseconds / 1000000)
-        )
-
-        if elapsed_seconds < (self.sleep_time * 3):
-            if current == paths.heat:
-                chamber += elapsed_seconds * self.heat_rate  # 0.01
-            elif current == paths.cool:
-                chamber -= elapsed_seconds * self.cool_rate  # 0.15
-
-            beer += (chamber - beer) * (elapsed_seconds * self.chamber_to_beer)
-            chamber += (
-                (beer - chamber) * (elapsed_seconds * self.beer_to_chamber)
-            )
-
-            chamber += (
-                (ambient - chamber)
-                * (elapsed_seconds * self.ambient_to_chamber)
-            )
-
-        result = {}
-        result['sensor1'] = beer
-        result['sensor2'] = chamber
-        result['sensor3'] = str(ambient + random.uniform(-0.2, 0.1))
-
-        return result
 
     def map_sensors(self, readings):
         result = {}
@@ -102,7 +49,7 @@ class BrewfermSensors:
         if self.current_reading:
             self.xd.write_sensors(self.map_sensors(self.current_reading))
         else:
-            self.xd.write_sensors(self.map_sensors(self.emulate_temps()))
+            logging.warning('no sensors read')
 
     def scan_sensors(self):
         self.current_reading = {}
@@ -112,7 +59,6 @@ class BrewfermSensors:
                 for candidate in possible:
                     t1 = self.gettemp(candidate.name)
                     if t1 is not None:
-                        # logging.info('found %s', candidate.name)
                         temp_f = (float(t1) * 9.0) / 5000 + 32.0
                         self.current_reading[candidate.name] = temp_f
         except Exception as e:
@@ -131,7 +77,6 @@ class BrewfermSensors:
 
             if crc == 'YES':
                 line = f.readline()  # read 2nd line
-                # logging.debug('line2=%s', line)
                 mytemp = line.rsplit('t=', 1)[1]
             else:
                 mytemp = None

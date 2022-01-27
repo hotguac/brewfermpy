@@ -263,8 +263,6 @@ class Xchg():
             s = self.mm.readline()
             self.last = json.loads(s.decode('utf-8'))
 
-            #self.mmap_file.close()
-            #self.mmap_file = None
             return self.last
         except ValueError:
             if self.last_warning_ts < (datetime.now() - timedelta(minutes=5)):

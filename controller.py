@@ -22,24 +22,23 @@ class BrewfermController():
 
         self.xd = XchgData(paths.controller_out)
 
-        self.beer_target = self.xd.get(paths.beer_target)
-        self.chamber_temp = self.xd.get(paths.chamber_temp)
-        if (self.chamber_temp is None) or (self.beer_target is None):
+        beer_target = self.xd.get(paths.beer_target)
+        chamber_temp = self.xd.get(paths.chamber_temp)
+        if (chamber_temp is None) or (beer_target is None):
             logging.info('not ready yet, exiting')
             sys.exit(0)
 
-        self.beer_temp = self.xd.get(paths.beer_temp)
         self.beer_tuning = self.xd.get(paths.beerPID)
         self.chamber_tuning = self.xd.get(paths.chamberPID)
 
         self.desired_state = paths.idle
 
-        self.beerPID = BeerPID(self.beer_target)
+        self.beerPID = BeerPID(beer_target)
         self.beerPID.set_tuning(self.beer_tuning)
-        self.beerPID.pid._last_output = self.beer_target
-        self.beerPID.pid._integral = self.beer_target
+        self.beerPID.pid._last_output = beer_target
+        self.beerPID.pid._integral = beer_target
 
-        self.chamberPID = ChamberPID(self.beer_target)
+        self.chamberPID = ChamberPID(beer_target)
         self.chamberPID.set_tuning(self.chamber_tuning)
         self.chamberPID.pid._last_output = 50
         self.chamberPID.pid._integral = 50
@@ -49,14 +48,16 @@ class BrewfermController():
     def calculate(self):
         try:
             beer_target = self.xd.get(paths.beer_target)
+            beer_temp = self.xd.get(paths.beer_temp)
+            chamber_temp = self.xd.get(paths.chamber_temp)
 
             if beer_target != self.beerPID.pid.setpoint:
                 self.beerPID.change_target(beer_target)
 
-            x = self.beerPID.update(self.beer_temp)
+            x = self.beerPID.update(beer_temp)
             self.chamberPID.pid.setpoint = x
 
-            self.heat_cool = self.chamberPID.update(float(self.chamber_temp))
+            self.heat_cool = self.chamberPID.update(float(chamber_temp))
             ckp, cki, ckd = self.chamberPID.pid.components
             bkp, bki, bkd = self.beerPID.pid.components
 
@@ -64,9 +65,9 @@ class BrewfermController():
             if ts > (self.last_output + timedelta(minutes=2)):
                 self.last_output = ts
                 logging.debug(
-                    ' beer = %.1f / %.1f / %.1f %s / %s '
-                    ' chamber = %.1f / %.1f / %.1f / %.1f %s / %s',
-                    round(self.beer_temp, 2),
+                    ' beer = c%.1f / t%.1f / I%.1f pi%s / st%s '
+                    ' chamber = c%.1f / t%.1f / hc%.1f / I%.1f pi%s / st%s',
+                    round(beer_temp, 2),
                     round(self.beerPID.pid.setpoint),
                     round(bki, 1),
                     (
@@ -74,7 +75,7 @@ class BrewfermController():
                         self.beerPID.pid.tunings[1]
                     ),
                     round(self.beerPID.pid.sample_time, 1),
-                    round(self.chamber_temp, 2),
+                    round(chamber_temp, 2),
                     round(x, 1),
                     round(self.heat_cool, 2),
                     round(cki, 1),
@@ -94,19 +95,24 @@ class BrewfermController():
             logging.exception("%s %s", type(e), e)
 
     def update(self):
-        self.beer_temp = self.xd.get(paths.beer_temp)
-        self.chamber_temp = self.xd.get(paths.chamber_temp)
+        beer_temp = self.xd.get(paths.beer_temp)
+        beer_target = self.xd.get(paths.beer_target)
 
         if self.xd.get(paths.state, paths.paused) == paths.paused:
             self.desired_state = paths.paused
         else:
             self.calculate()
-            self.desired_state = paths.idle
 
             if self.heat_cool > 80:
-                self.desired_state = paths.heat
-            if self.heat_cool < 20:
-                self.desired_state = paths.cool
+                if ((beer_temp - beer_target) > 10):
+                    self.desired_state = paths.idle
+                else:
+                    self.desired_state = paths.heat
+            else:
+                if self.heat_cool < 20:
+                    self.desired_state = paths.cool
+                else:
+                    self.desired_state = paths.idle
 
         beertuning = self.xd.get(paths.beerPID)
         chambertuning = self.xd.get(paths.chamberPID)

@@ -2,6 +2,9 @@
 
 # Import 3rd party libraries --------------------------------------------------
 import tkinter as tk
+import tkinter.font as tkFont
+
+# import tkFont
 
 # Import standard libraries ---------------------------------------------------
 import logging
@@ -69,6 +72,7 @@ else:
         "Canvas Size = height %d and width %d",
         root.winfo_height(),
         root.winfo_width())
+    logging.info('Available fonts=%s',tkFont.names())
 
 #
 #   Widgets -----------------------------------

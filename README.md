@@ -1,31 +1,38 @@
-Note: This software is pre-Alpha!!! Not ready to test
+Note: This software is Alpha!!! 
 
-sudo pip3 install mariadb
-sudo pip3 install simple-pid
+This should, but hasn't been tested, to work with HDMI out on the rpi. I've developed against a touch-screen LCD with dimension 640x480.
 
-sudo cp services/brewferm-sensors.service /lib/systemd/system/
-sudo cp services/brewferm-relays.service /lib/systemd/system/
-sudo cp services/brewferm-gui.service /lib/systemd/system/
-sudo cp services/brewferm-controller.service /lib/systemd/system
+* sudo pip3 install mariadb
+* sudo pip3 install simple-pid
+
+
+* sudo cp services/brewferm-sensors.service /lib/systemd/system/
+* sudo cp services/brewferm-relays.service /lib/systemd/system/
+* sudo cp services/brewferm-gui.service /lib/systemd/system/
+* sudo cp services/brewferm-controller.service /lib/systemd/system
 
 sudo systemctl daemon-reload
 
-sudo systemctl enable brewferm-sensors.service
-sudo systemctl enable brewferm-relays.service
-sudo systemctl enable brewferm-gui.service
-sudo systemctl enable brewferm-controller.service
+* sudo systemctl enable brewferm-sensors.service
+* sudo systemctl enable brewferm-relays.service
+* sudo systemctl enable brewferm-gui.service
+* sudo systemctl enable brewferm-controller.service
 
-sudo systemctl start brewferm-sensors.service
-sudo systemctl start brewferm-relays.service
-sudo systemctl start brewferm-gui.service
-sudo systemctl start brewferm-controller.service
+* sudo systemctl start brewferm-sensors.service
+* sudo systemctl start brewferm-relays.service
+* sudo systemctl start brewferm-gui.service
+* sudo systemctl start brewferm-controller.service
 
-sudo systemctl status brewferm-sensors.service
-sudo systemctl status brewferm-relays.service
-sudo systemctl status brewferm-gui.service
-sudo systemctl status brewferm-controller.service
+* sudo systemctl status brewferm-sensors.service
+* sudo systemctl status brewferm-relays.service
+* sudo systemctl status brewferm-gui.service
+* sudo systemctl status brewferm-controller.service
 
 cat /home/pi/brewferm/logs/*.log
 
-Todo: add min and max on,off and between time limits to relays logic
-
+I'll be adding diagrams but for now:
+  * If you're not qualified to work with high voltages, hire someone qualified
+  * Hook up a Solid-State Relay (SSR) of at least 25amps to pins defined in relays.py statement ' myrelays = BrewfermRelays(cool_pin, heat_pin)'
+  * Hook up one-wire sensors
+  * Look at the sensor service's output, located at the location paths.sensors_out
+  * Update the sensor assignment in    x['id_map'] = in module gui_middle.py  TODO: allow user to configure through GUI

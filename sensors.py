@@ -25,7 +25,7 @@ class BrewfermSensors:
 
     def update_mapping(self):
         try:
-            self.id_map = self.xd.get('sensor_map', {})
+            self.id_map = self.xd.get(paths.sensor_map, {})
         except Exception as e:
             logging.exception('update_mapping %s %s', type(e), e)
 

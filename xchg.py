@@ -48,16 +48,17 @@ class XchgData():
         try:
             switcher = {
                 paths.current: lambda: self.get_relays(field_name),
-                'relays_ts': lambda: self.get_relays('ts'),
+                paths.relays_ts: lambda: self.get_relays('ts'),
                 paths.desired: lambda: self.get_controller(field_name),
-                'desired_ts': lambda: self.get_controller('ts'),
+                paths.desired_ts: lambda: self.get_controller('ts'),
                 paths.chamber_temp: lambda: self.get_temp('chamber'),
                 paths.beer_temp: lambda: self.get_temp('beer'),
                 paths.beer_target: lambda: self.get_gui('beer_target'),
                 paths.beerPID: lambda: self.get_gui('beer_pid'),
                 paths.chamberPID: lambda: self.get_gui('chamber_pid'),
                 paths.state: lambda: self.get_gui('state'),
-                'sensor_map': lambda: self.get_gui('id_map')
+                paths.sensor_map: lambda: self.get_gui('id_map'),
+                paths.sensors_raw: lambda: self.get_sensors_raw()
             }
 
             result = switcher.get(field_name)  # returns a function object
@@ -137,6 +138,17 @@ class XchgData():
         else:
             return result
 
+    def get_sensors_raw(self):
+        try:
+            if self.sensors_out is None:
+                self.sensors_out = Xchg(paths.sensors_out, self.sensors_mode)
+
+            result = self.sensors_out.read()
+        except Exception as e:
+            logging.exception("%s %s", type(e), e)
+
+        return result
+            
     def get_sensors(self, field_name):
         try:
             if self.sensors_out is None:

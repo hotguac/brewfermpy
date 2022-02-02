@@ -56,6 +56,13 @@ class gMiddle(tk.Frame):
         self.relays_hc_balance = 2.0
         self.relays_zone_size = 20  # 0-20 cool ; 80-100 heat
 
+        temp_map = {  # TODO: user configure
+            '28-00000b812382': 'beer',
+            '28-000008802d75': 'chamber'
+        }
+
+        self.id_map = self.xd.get(paths.sensor_map, temp_map)
+
         self.create_widgets()
         self.after(1000, self.update_out)
 
@@ -197,10 +204,11 @@ class gMiddle(tk.Frame):
             'zone_size': self.relays_zone_size
         }
 
-        x['id_map'] = {  # TODO: user configure
-            '28-00000b812382': 'beer',
-            '28-000008802d75': 'chamber'
-        }
+        x['id_map'] = self.id_map
+        # {  # TODO: user configure
+        #     '28-00000b812382': 'beer',
+        #     '28-000008802d75': 'chamber'
+        # }
 
         return x
 
@@ -224,13 +232,13 @@ class gMiddle(tk.Frame):
 
     def settings(self):
         try:
-            if self.settings_button['text'] == "Settings":
-                self.settings_button['text'] = "Back"
+            if self.settings_button['text'] == paths.action_settings:
+                self.settings_button['text'] = paths.action_back
                 self.btemps.hide()
                 self.menu.show()
             else:
-                if self.settings_button['text'] == "Back":
-                    self.settings_button['text'] = "Settings"
+                if self.settings_button['text'] == paths.action_back:
+                    self.settings_button['text'] = paths.action_settings
                     self.menu.hide()
                     self.sensor_assign.hide()
                     self.btemps.show_beer()

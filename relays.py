@@ -23,7 +23,7 @@ class BrewfermRelays:
         self.cool_pin = cool_pin
         self.heat_pin = heat_pin
         self.setup_gpio()
-        self.sleep_time = 2
+        self.sleep_time = 30  # 2
         self.timeout = False
 
         start_time = datetime.now()
@@ -65,6 +65,7 @@ class BrewfermRelays:
             return self.cool_off
 
     def check_min_max(self, desired_state):
+        # logging.debug('current_state = %s desired = %s', self.current_state, desired_state)
         now = datetime.now()
         last_off = self.last_turned_off()
 
@@ -116,7 +117,7 @@ class BrewfermRelays:
             return paths.idle
 
         if (self.current_state == paths.paused):
-            if (self.xd.get(paths.state) == paths.running):
+            if (self.xd.get(paths.state) == paths.running) and (desired_state != paths.paused):
                 return paths.idle
             else:
                 return paths.paused

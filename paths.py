@@ -29,3 +29,17 @@ running = 'running'
 paused = 'paused'
 
 default_beer_target = 64
+
+beer_sensor = 'Beer'
+chamber_sensor = 'Chamber'
+ambient_sensor = 'Ambient'
+spare_sensor = 'Spare'
+
+action_settings = 'Settings'
+action_back = 'Back'
+
+sensor_map = 'sensor_map'
+relays_ts = 'relays_ts'
+desired_ts = 'desired_ts'
+
+sensors_raw = 'sensors_raw'

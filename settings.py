@@ -97,7 +97,6 @@ class gMenu(tk.Frame):
         self.master.btemps.show_target()
 
     def assign_sensors(self):
-        logging.debug("in gMenu assign_sensors")
         self.hide()
         self.master.sensor_assign.show()
 

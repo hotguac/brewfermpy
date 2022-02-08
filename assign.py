@@ -39,22 +39,30 @@ class gAssign(tk.Frame):
         slot = 0
         try:
             for id in self.sensors_raw:
+                if id == 'ts':
+                    continue
+
+                if 'unknown' in id:
+                    current_usage = 'spare'
+                else:
+                    current_usage = id
+                    
                 if id != 'ts':
                     slot = slot + 1
                     if slot == 1:
-                        self.func1['text'] = id
+                        self.func1['text'] = current_usage
                         for x in self.sensors_raw[id]:
                             self.id1['text'] = x
                             self.temp1['text'] = str(round(self.sensors_raw[id][x]))
 
                     if slot == 2:
-                        self.func2['text'] = id
+                        self.func2['text'] = current_usage
                         for x in self.sensors_raw[id]:
                             self.id2['text'] = x
                             self.temp2['text'] = str(round(self.sensors_raw[id][x]))
 
                     if slot == 3:
-                        self.func3['text'] = id
+                        self.func3['text'] = current_usage
                         for x in self.sensors_raw[id]:
                             self.id3['text'] = x
                             self.temp3['text'] = str(round(self.sensors_raw[id][x]))
@@ -118,7 +126,7 @@ class gAssign(tk.Frame):
 
         self.func1 = tk.Button(
             self.master.values_box,
-            text='open',
+            text='spare',
             command=self.store1,
             foreground=colors.background,
             background=colors.normal50,
@@ -134,7 +142,7 @@ class gAssign(tk.Frame):
 
         self.func2 = tk.Button(
             self.master.values_box,
-            text='open',
+            text='spare',
             command=self.store2,
             foreground=colors.background,
             background=colors.normal50,
@@ -150,7 +158,7 @@ class gAssign(tk.Frame):
 
         self.func3 = tk.Button(
             self.master.values_box,
-            text='open',
+            text='spare',
             command=self.store3,
             foreground=colors.background,
             background=colors.normal50,
@@ -237,7 +245,7 @@ class gAssign(tk.Frame):
                 self.func1['text'] = self.get_new_function(1, self.func1['text'])
                 self.use_new_map()
             else:
-                self.func1['text'] = 'open'
+                self.func1['text'] = 'spare'
         except Exception as e:
             logging.exception('%s', e)
 
@@ -247,7 +255,7 @@ class gAssign(tk.Frame):
                 self.func2['text'] = self.get_new_function(2, self.func2['text'])
                 self.use_new_map()
             else:
-                self.func2['text'] = 'open'
+                self.func2['text'] = 'spare'
         except Exception as e:
             logging.exception('%s', e)
 
@@ -257,7 +265,7 @@ class gAssign(tk.Frame):
                 self.func3['text'] = self.get_new_function(3, self.func3['text'])
                 self.use_new_map()
             else:
-                self.func3['text'] = 'open'
+                self.func3['text'] = 'spare'
         except Exception as e:
             logging.exception('%s', e)
 

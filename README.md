@@ -35,5 +35,4 @@ I'll be adding diagrams but for now:
   * If you're not qualified to work with high voltages, hire someone qualified
   * Hook up a Solid-State Relay (SSR) of at least 25amps to pins defined in relays.py statement ' myrelays = BrewfermRelays(cool_pin, heat_pin)'
   * Hook up one-wire sensors
-  * Look at the sensor service's output, located at the location paths.sensors_out
-  * Update the sensor assignment in    x['id_map'] = in module gui_middle.py  TODO: allow user to configure through GUI
+  * Use 'Settings'->'Assign Sensors' screen to assign a sensor to a function. Clicking the button next to the sensor id will cycle through available functions. 

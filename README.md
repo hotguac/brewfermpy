@@ -1,6 +1,10 @@
-Note: This software is Alpha!!! 
+This is a temperature controller for a fermentation chamber designed for a rpi with a touchscreen. It controls both heat and cooling relays using a dual-loop PID controller. It requires two one-wire temperature sensors, one for the beer and one for the chamber. A third sensor is supported for ambient temperature outside the chamber.
+
+![Main Screen](screenshots/MainScreen.png)
 
 This should, but hasn't been tested, to work with HDMI out on the rpi. I've developed against a touch-screen LCD with dimension 640x480.
+
+It has the capability to control the temperature of the beer within 0.1F, although it would normally be tuned looser to save energy. The target temperature and the sensor assignments are maintained through the GUI. Presently the parameters for the two PID controllers (beer and chamber) are in the python code. The ability to adjust the PID parameters is the next development step.
 
 ```
 sudo pip3 install mariadb

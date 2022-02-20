@@ -24,18 +24,20 @@ class gAssign(tk.Frame):
         self.master = master
 
         self.create_widgets()
-        
-        self.xd = XchgData()  # read only for now
-        self.sensor_map = self.xd.get(paths.sensor_map)
-        self.sensors_raw = self.xd.get(paths.sensors_raw)
 
+        self.xd = XchgData()  # read only for now
+        self.sensor_map = None
+        self.sensors_raw = None
+
+        self.visible = False
         self.populate_widgets()
 
     def populate_widgets(self):
-        logging.debug('map = %s', self.sensor_map)
-        logging.debug('raw = %s', self.sensors_raw)
+        self.sensor_map = self.xd.get(paths.sensor_map)
+        self.sensors_raw = self.xd.get(paths.sensors_raw)
 
-        result = {}
+        # logging.debug('raw = %s', self.sensors_raw)
+
         slot = 0
         try:
             for id in self.sensors_raw:
@@ -46,7 +48,7 @@ class gAssign(tk.Frame):
                     current_usage = 'spare'
                 else:
                     current_usage = id
-                    
+
                 if id != 'ts':
                     slot = slot + 1
                     if slot == 1:
@@ -66,12 +68,14 @@ class gAssign(tk.Frame):
                         for x in self.sensors_raw[id]:
                             self.id3['text'] = x
                             self.temp3['text'] = str(round(self.sensors_raw[id][x]))
-                        
+
+            if self.visible:
+                self.id1.after(2000, self.populate_widgets)
+
         except Exception as e:
-            logging.exception('%s', id)
+            logging.exception('%s', e)
 
     def create_widgets(self):
-        # normal_font = font.Font(family='FreeMono', size=-36)  # , weight='bold')
         normal_font = font.Font(family='DejaVu Sans Mono', size=-36)  # , weight='bold')
 
         self.id1 = tk.Label(self.master.values_box,
@@ -238,7 +242,7 @@ class gAssign(tk.Frame):
             self.master.id_map = new_map
         except Exception as e:
             logging.exception('%s', e)
-            
+
     def store1(self):
         try:
             if self.id1['text'] != '':
@@ -270,6 +274,7 @@ class gAssign(tk.Frame):
             logging.exception('%s', e)
 
     def hide(self):
+        self.visible = False
         self.id1.place(x=0, y=0, height=0, width=0)
         self.id2.place(x=0, y=0, height=0, width=0)
         self.id3.place(x=0, y=0, height=0, width=0)
@@ -283,6 +288,8 @@ class gAssign(tk.Frame):
         self.temp3.place(x=0, y=0, height=0, width=0)
 
     def show(self):
+        self.visible = True
+        self.populate_widgets()
         self.id1.place(x=140, y=60, height=80, width=340)
         self.id2.place(x=140, y=120, height=80, width=340)
         self.id3.place(x=140, y=180, height=80, width=340)

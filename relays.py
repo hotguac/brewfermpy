@@ -40,7 +40,7 @@ class BrewfermRelays:
         self.max_on = 7  # minutes
         self.min_on = 1  # minutes
 
-        self.hc_balance = 4  # multiply times for heat
+        self.hc_balance = 6  # multiply times for heat
 
     # Functions ------------------------------------------------------------
     def setup_gpio(self):

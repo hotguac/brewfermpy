@@ -25,6 +25,7 @@ class XchgData():
         self.gui_mode = self.read_mode
         self.sensors_mode = self.read_mode
         self.relays_mode = self.read_mode
+        self.blue_mode = self.read_mode
 
         if path is not None:
             if self.path == paths.sensors_out:
@@ -39,9 +40,13 @@ class XchgData():
             if self.path == paths.gui_out:
                 self.gui_mode = self.update_mode
 
+            if self.path == paths.blue_out:
+                self.blue_mode = self.update_mode
+
         self.sensors_out = None
         self.controller_out = None
         self.relays_out = None
+        self.blue_out = None
         self.gui_out = Xchg(paths.gui_out, self.gui_mode)
 
     def get(self, field_name, default=None):
@@ -58,7 +63,8 @@ class XchgData():
                 paths.chamberPID: lambda: self.get_gui('chamber_pid'),
                 paths.state: lambda: self.get_gui('state'),
                 paths.sensor_map: lambda: self.get_gui('id_map'),
-                paths.sensors_raw: lambda: self.get_sensors_raw()
+                paths.sensors_raw: lambda: self.get_sensors_raw(),
+                paths.blue_sg: lambda: self.get_blue()
             }
 
             result = switcher.get(field_name)  # returns a function object
@@ -72,6 +78,22 @@ class XchgData():
                 return default
         except Exception as e:
             logging.exception('%s %s', type(e), e)
+
+    def get_blue(self):
+        try:
+            # TODO
+            if self.blue_out is None:
+                self.blue_out = Xchg(paths.blue_out, self.blue_mode)
+
+            x = self.blue_out.read()
+            result = None
+            if 'sg' in x.keys():
+                result = x['sg']
+            logging.debug('TODO get_blue')
+        except Exception as e:
+            logging.exception('%s %s', type(e), e)
+
+        return result
 
     def get_relays(self, field_name):
         try:
@@ -148,7 +170,7 @@ class XchgData():
             logging.exception("%s %s", type(e), e)
 
         return result
-            
+
     def get_sensors(self, field_name):
         try:
             if self.sensors_out is None:
@@ -217,6 +239,19 @@ class XchgData():
                     self.relays_out = Xchg(paths.relays_out, self.relays_mode)
 
                 self.relays_out.write(value)
+        except Exception as e:
+            logging.exception("%s %s", type(e), e)
+
+    def write_blue(self, value):
+        try:
+            if self.blue_mode != self.update_mode:
+                logging.debug(
+                    'attempted write to a file that opened ready only')
+            else:
+                if self.blue_out is None:
+                    self.blue_out = Xchg(paths.blue_out, self.blue_mode)
+
+                self.blue_out.write(value)
         except Exception as e:
             logging.exception("%s %s", type(e), e)
 

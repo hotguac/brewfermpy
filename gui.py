@@ -72,7 +72,7 @@ else:
         "Canvas Size = height %d and width %d",
         root.winfo_height(),
         root.winfo_width())
-    logging.info('Available fonts=%s',tkFont.names())
+    logging.info('Available fonts=%s', tkFont.names())
 
 #
 #   Widgets -----------------------------------

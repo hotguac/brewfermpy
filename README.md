@@ -3,13 +3,16 @@ Note: This software is Alpha!!!
 This should, but hasn't been tested, to work with HDMI out on the rpi. I've developed against a touch-screen LCD with dimension 640x480.
 
 ```
+sudo apt install bluetooth libbluetooth-dev libglib2.0-dev
+sudo pip3 install bluepy
+
+sudo apt install nginx python3-flask
+sudo pip3 install gattlib glib-2.0
 sudo pip3 install mariadb
 sudo pip3 install simple-pid
+sudo pip3 install flask uwsgi
 
-sudo cp services/brewferm-sensors.service /lib/systemd/system/
-sudo cp services/brewferm-relays.service /lib/systemd/system/
-sudo cp services/brewferm-gui.service /lib/systemd/system/
-sudo cp services/brewferm-controller.service /lib/systemd/system
+sudo cp services/brewferm-*.service /lib/systemd/system/
 
 sudo systemctl daemon-reload
 

@@ -12,7 +12,7 @@ import colors
 
 
 # -------------------------------------------------------------------
-#
+# Allow user to change system settings
 # -------------------------------------------------------------------
 class gMenu(tk.Frame):
     def __init__(self, master=None):

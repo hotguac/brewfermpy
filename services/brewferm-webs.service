@@ -1,0 +1,16 @@
+[Unit]
+Description=Brewferm Web Server
+After=brewferm-blues.service
+
+[Service]
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/brewferm/webserver
+ExecStart=/bin/bash -c 'uwsgi --uid pi --socket 0.0.0.0:8000 --protocol=http --wsgi-file /home/pi/brewferm/webserver/webs.py --callable app > /home/pi/brewferm/logs/webs.log 2>&1'
+Restart=always
+RestartSec=30s
+KillMode=process
+TimeoutSec=infinity
+
+[Install]
+WantedBy=multi-user.target

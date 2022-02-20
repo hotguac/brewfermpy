@@ -1,0 +1,14 @@
+[Unit]
+Description=Brewferm Bluetooth Controller
+
+[Service]
+User=root
+Group=root
+ExecStart=/bin/bash -c '/usr/bin/python3 /home/pi/brewferm/blues.py > /home/pi/brewferm/logs/blues.log 2>&1'
+Restart=always
+RestartSec=60s
+KillMode=process
+TimeoutSec=infinity
+
+[Install]
+WantedBy=multi-user.target

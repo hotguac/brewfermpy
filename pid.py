@@ -57,6 +57,7 @@ class BeerPID:
         return self.pid(current_temp)
 
     def change_target(self, setpoint):
+        # TODO: the low limit is wrong!! get from controller
         low_limit = setpoint - 6
         if low_limit < 34:
             low_limit = 34

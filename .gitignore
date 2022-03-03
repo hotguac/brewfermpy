@@ -1,4 +1,5 @@
 __pycache__/*
-logs/*.log
+logs/*.log*
 xchg/*
 simple_pid.py
+webserver/__pycache__/*

@@ -6,3 +6,7 @@ sudo systemctl stop brewferm-relays.service
 sudo systemctl kill brewferm-relays.service
 sudo systemctl stop brewferm-gui.service
 sudo systemctl kill brewferm-gui.service
+sudo systemctl stop brewferm-blues.service
+sudo systemctl kill brewferm-blues.service
+sudo systemctl stop brewferm-webs.service
+sudo systemctl kill brewferm-webs.service

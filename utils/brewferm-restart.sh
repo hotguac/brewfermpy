@@ -5,3 +5,7 @@ sleep 10
 sudo systemctl start brewferm-controller.service
 sleep 20
 sudo systemctl start brewferm-relays.service
+sleep 10
+sudo systemctl start brewferm-blues.service
+sleep 10
+sudo systemctl start brewferm-webs.service

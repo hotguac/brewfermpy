@@ -81,7 +81,6 @@ class XchgData():
 
     def get_blue(self):
         try:
-            # TODO
             if self.blue_out is None:
                 self.blue_out = Xchg(paths.blue_out, self.blue_mode)
 
@@ -89,7 +88,6 @@ class XchgData():
             result = None
             if 'sg' in x.keys():
                 result = x['sg']
-            logging.debug('TODO get_blue')
         except Exception as e:
             logging.exception('%s %s', type(e), e)
 

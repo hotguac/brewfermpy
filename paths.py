@@ -45,3 +45,11 @@ relays_ts = 'relays_ts'
 desired_ts = 'desired_ts'
 
 sensors_raw = 'sensors_raw'
+
+default_beerP = 8.0
+default_beerI = 0.0015
+default_beerD = 0
+
+default_chamberP = 8.0
+default_chamberI = 0.0015
+default_chamberD = 0

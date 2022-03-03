@@ -10,6 +10,8 @@ import logging
 # Import application libraries --------------------------------------
 import assign
 import beer_temps
+import bpid
+import cpid
 import colors
 import paths
 import settings
@@ -28,6 +30,8 @@ class gMiddle(tk.Frame):
         self.btemps = None  # will hold a gBeerTemps object
         self.menu = None  # will hold a gMenu object
         self.sensor_assign = None  # will hold a gAssign object
+        self.bpid_settings = None  # will hold a gBPID object
+        self.cpid_settings = None  # will hold a gCPID object
 
         self.xd = XchgData(paths.gui_out)
 
@@ -39,9 +43,9 @@ class gMiddle(tk.Frame):
 
         btuning = self.xd.get(paths.beerPID, {})
 
-        self.beer_kp = btuning.get('kp', 8.0)
-        self.beer_ki = btuning.get('ki', 0.0015)  # 0.0001
-        self.beer_kd = btuning.get('kd', 0.0)
+        self.beer_kp = btuning.get('kp', paths.default_beerP)  # 8.0)
+        self.beer_ki = btuning.get('ki', paths.default_beerI)  # 0.0015)  # 0.0001
+        self.beer_kd = btuning.get('kd', paths.default_beerI)  # 0.0)
         self.beer_sample_time = btuning.get('sample_time', 60)
 
         ctuning = self.xd.get(paths.chamberPID, {})
@@ -174,6 +178,12 @@ class gMiddle(tk.Frame):
             if self.sensor_assign is None:
                 self.sensor_assign = assign.gAssign(master=self)
 
+            if self.bpid_settings is None:
+                self.bpid_settings = bpid.gBPID(master=self)
+
+            if self.cpid_settings is None:
+                self.cpid_settings = cpid.gCPID(master=self)
+
             self.xd.write_gui(self.format_state())
         except Exception as e:
             logging.exception('%s %s', type(e), e)
@@ -239,8 +249,12 @@ class gMiddle(tk.Frame):
             else:
                 if self.settings_button['text'] == paths.action_back:
                     self.settings_button['text'] = paths.action_settings
+
                     self.menu.hide()
                     self.sensor_assign.hide()
+                    self.bpid_settings.hide()
+                    self.cpid_settings.hide()
+
                     self.btemps.show_beer()
 
         except Exception as e:

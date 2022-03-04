@@ -194,15 +194,15 @@ class gMiddle(tk.Frame):
         x[paths.state] = self.state
 
         x['beer_pid'] = {
-            'kp': self.beer_kp,
-            'ki': self.beer_ki,
+            'kp': round(self.beer_kp, 1),
+            'ki': round(self.beer_ki, 4),
             'kd': self.beer_kd,
             'sample_time': self.beer_sample_time
             }
 
         x['chamber_pid'] = {
-            'kp': self.chamber_kp,
-            'ki': self.chamber_ki,
+            'kp': round(self.chamber_kp, 1),
+            'ki': round(self.chamber_ki, 4),
             'kd': self.chamber_kd,
             'sample_time': self.chamber_sample_time
             }

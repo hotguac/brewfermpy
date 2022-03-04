@@ -5,7 +5,6 @@ import tkinter as tk
 import tkinter.font as font
 
 # Import standard libraries -----------------------------------------
-# import logging
 
 # Import application libraries --------------------------------------
 import colors
@@ -30,10 +29,12 @@ class gBPID(tk.Frame):
         self.populate_widgets()
 
     def populate_widgets(self):
-        self.beer_P['text'] = 'P ' + str(self.master.beer_kp)
+        self.beer_P['text'] = 'P ' + str(round(self.master.beer_kp, 1))
+        self.beer_I['text'] = 'I ' + str(round(self.master.beer_ki, 4))
 
     def create_widgets(self):
-        self.button_font = font.Font(family='TkTextFont', size=-60, weight='bold')
+        font1 = font.Font(family='TkTextFont', size=-60, weight='bold')
+        font2 = font.Font(family='TkTextFont', size=-40, weight='bold')
 
         self.plus_P = tk.Button(
             self.master.values_box,
@@ -43,7 +44,7 @@ class gBPID(tk.Frame):
             background=colors.normal50,
             borderwidth=0,
             highlightthickness=0,
-            font=self.button_font,
+            font=font1,
             activebackground=colors.normal_button,
             highlightbackground=colors.normal_button,
             highlightcolor=colors.normal_button,
@@ -58,7 +59,7 @@ class gBPID(tk.Frame):
             background=colors.normal50,
             borderwidth=0,
             highlightthickness=0,
-            font=self.button_font,
+            font=font1,
             activebackground=colors.normal_button,
             highlightbackground=colors.normal_button,
             highlightcolor=colors.normal_button,
@@ -73,19 +74,75 @@ class gBPID(tk.Frame):
             background=colors.normal50,
             borderwidth=0,
             highlightthickness=0,
-            font=self.button_font,
+            font=font2,
             activebackground=colors.normal_button,
             highlightbackground=colors.normal_button,
             highlightcolor=colors.normal_button,
             relief=tk.FLAT
             )
 
-        self.beer_P = tk.Label(self.master.values_box,
-                               text="P ?.?",
-                               background=colors.background,
-                               fg=colors.normal50,
-                               font=self.button_font
-                               )
+        self.beer_P = tk.Label(
+            self.master.values_box,
+            text="P ?.?",
+            background=colors.background,
+            fg=colors.normal50,
+            font=font2
+            )
+
+        # Integrator Values
+
+        self.plus_I = tk.Button(
+            self.master.values_box,
+            text="+",
+            command=self.increase_I,
+            foreground=colors.background,
+            background=colors.normal50,
+            borderwidth=0,
+            highlightthickness=0,
+            font=font1,
+            activebackground=colors.normal_button,
+            highlightbackground=colors.normal_button,
+            highlightcolor=colors.normal_button,
+            relief=tk.FLAT
+            )
+
+        self.minus_I = tk.Button(
+            self.master.values_box,
+            text="-",
+            command=self.decrease_I,
+            foreground=colors.background,
+            background=colors.normal50,
+            borderwidth=0,
+            highlightthickness=0,
+            font=font1,
+            activebackground=colors.normal_button,
+            highlightbackground=colors.normal_button,
+            highlightcolor=colors.normal_button,
+            relief=tk.FLAT
+            )
+
+        self.default_I = tk.Button(
+            self.master.values_box,
+            text="@",
+            command=self.default_I,
+            foreground=colors.background,
+            background=colors.normal50,
+            borderwidth=0,
+            highlightthickness=0,
+            font=font2,
+            activebackground=colors.normal_button,
+            highlightbackground=colors.normal_button,
+            highlightcolor=colors.normal_button,
+            relief=tk.FLAT
+            )
+
+        self.beer_I = tk.Label(
+            self.master.values_box,
+            text="I ?.?",
+            background=colors.background,
+            fg=colors.normal50,
+            font=font2
+            )
 
     def increase_P(self):
         self.master.beer_kp += 0.1
@@ -99,18 +156,41 @@ class gBPID(tk.Frame):
         self.master.beer_kp = paths.default_beerP
         self.populate_widgets()
 
+    def increase_I(self):
+        self.master.beer_ki += 0.0005
+        self.populate_widgets()
+
+    def decrease_I(self):
+        self.master.beer_ki -= 0.0005
+        self.populate_widgets()
+
+    def default_I(self):
+        self.master.beer_ki = paths.default_beerI
+        self.populate_widgets()
+
     def hide(self):
         self.visible = False
+
         self.plus_P.place(x=0, y=0, height=0, width=0)
         self.minus_P.place(x=0, y=0, height=0, width=0)
         self.beer_P.place(x=0, y=0, height=0, width=0)
         self.default_P.place(x=0, y=0, height=0, width=0)
 
+        self.plus_I.place(x=0, y=0, height=0, width=0)
+        self.minus_I.place(x=0, y=0, height=0, width=0)
+        self.beer_I.place(x=0, y=0, height=0, width=0)
+        self.default_I.place(x=0, y=0, height=0, width=0)
+
     def show(self):
         self.visible = True
         self.populate_widgets()
 
-        self.plus_P.place(x=160, y=60, height=80, width=80)
-        self.minus_P.place(x=260, y=60, height=80, width=80)
-        self.beer_P.place(x=360, y=60, height=80, width=240)
-        self.default_P.place(x=700, y=60, height=80, width=80)
+        self.plus_P.place(x=160, y=60, height=60, width=60)
+        self.minus_P.place(x=260, y=60, height=60, width=60)
+        self.beer_P.place(x=360, y=60, height=60, width=240)
+        self.default_P.place(x=720, y=60, height=60, width=80)
+
+        self.plus_I.place(x=160, y=140, height=60, width=60)
+        self.minus_I.place(x=260, y=140, height=60, width=60)
+        self.beer_I.place(x=360, y=140, height=60, width=240)
+        self.default_I.place(x=720, y=140, height=60, width=80)

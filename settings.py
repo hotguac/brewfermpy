@@ -101,7 +101,6 @@ class gMenu(tk.Frame):
         self.master.sensor_assign.show()
 
     def set_beer_pid(self):
-        logging.debug('in set beer pid')
         self.hide()
         self.master.bpid_settings.show()
 

@@ -68,9 +68,20 @@ if __name__ == "__main__":
         myblues = BrewfermBlues()
 
         killer = killer.GracefulKiller()
+        not_ready = False
+
         while not killer.kill_now:
-            myblues.update()
-            myblues.implement_current()
+            try:
+                myblues.update()
+                myblues.implement_current()
+                if not_ready:
+                    logging.info('bluetooth ready')
+                    not_ready = False
+
+            except btle.BTLEManagementError:
+                not_ready = True
+                logging.warning('bluetooth not ready')
+
             sleep(myblues.sleep_time)
 
     except Exception as e:

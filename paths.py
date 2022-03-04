@@ -50,6 +50,6 @@ default_beerP = 8.0
 default_beerI = 0.0015
 default_beerD = 0
 
-default_chamberP = 8.0
-default_chamberI = 0.0015
+default_chamberP = 6.0
+default_chamberI = 0.004
 default_chamberD = 0

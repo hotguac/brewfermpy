@@ -64,7 +64,7 @@ class BrewfermController():
             ts = datetime.now()
             if ts > (self.last_output + timedelta(minutes=2)):
                 self.last_output = ts
-                logging.debug(
+                logging.info(
                     ' beer = c%.1f / t%.1f / I%.1f pi%s / st%s '
                     ' chamber = c%.1f / t%.1f / hc%.1f / I%.1f pi%s / st%s',
                     round(beer_temp, 2),
@@ -124,18 +124,11 @@ class BrewfermController():
             self.desired_state = paths.paused
         else:
             if beertuning != self.beer_tuning:
-                logging.debug(
-                    'old beer tuning %s vs new %s',
-                    beertuning,
-                    self.beer_tuning)
                 self.beer_tuning = beertuning
                 self.beerPID.set_tuning(self.beer_tuning)
 
             if chambertuning != self.chamber_tuning:
-                logging.debug(
-                    'old chamber tuning %s vs new %s',
-                    chambertuning,
-                    self.chamber_tuning)
+                self.chamber_tuning = chambertuning
                 self.chamberPID.set_tuning(self.chamber_tuning)
 
         self.output_desired()

@@ -29,15 +29,7 @@ class gAssign(tk.Frame):
         self.sensor_map = None
         self.sensors_raw = None
 
-        self.visible = False
-        self.populate_widgets()
-
     def populate_widgets(self):
-        self.sensor_map = self.xd.get(paths.sensor_map)
-        self.sensors_raw = self.xd.get(paths.sensors_raw)
-
-        # logging.debug('raw = %s', self.sensors_raw)
-
         slot = 0
         try:
             for id in self.sensors_raw:
@@ -68,10 +60,6 @@ class gAssign(tk.Frame):
                         for x in self.sensors_raw[id]:
                             self.id3['text'] = x
                             self.temp3['text'] = str(round(self.sensors_raw[id][x]))
-
-            if self.visible:
-                self.id1.after(2000, self.populate_widgets)
-
         except Exception as e:
             logging.exception('%s', e)
 
@@ -240,6 +228,7 @@ class gAssign(tk.Frame):
                 new_map[self.id3['text']] = self.func3['text']
 
             self.master.id_map = new_map
+            self.master.update_out(reschedule=False)
         except Exception as e:
             logging.exception('%s', e)
 
@@ -274,7 +263,6 @@ class gAssign(tk.Frame):
             logging.exception('%s', e)
 
     def hide(self):
-        self.visible = False
         self.id1.place(x=0, y=0, height=0, width=0)
         self.id2.place(x=0, y=0, height=0, width=0)
         self.id3.place(x=0, y=0, height=0, width=0)
@@ -288,8 +276,10 @@ class gAssign(tk.Frame):
         self.temp3.place(x=0, y=0, height=0, width=0)
 
     def show(self):
-        self.visible = True
+        self.sensor_map = self.xd.get(paths.sensor_map)
+        self.sensors_raw = self.xd.get(paths.sensors_raw)
         self.populate_widgets()
+
         self.id1.place(x=140, y=60, height=80, width=340)
         self.id2.place(x=140, y=120, height=80, width=340)
         self.id3.place(x=140, y=180, height=80, width=340)

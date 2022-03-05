@@ -164,9 +164,10 @@ class gMiddle(tk.Frame):
         self.lbl_target["font"] = ("Arial", -24)
         self.lbl_target.place(x=580, y=0, height=40, width=160)
 
-    def update_out(self):
+    def update_out(self, reschedule=True):
         try:
-            self.after(500, self.update_out)
+            if reschedule:
+                self.after(500, self.update_out)
 
             if self.btemps is None:
                 self.btemps = beer_temps.gBeerTemps(master=self)
@@ -215,10 +216,6 @@ class gMiddle(tk.Frame):
         }
 
         x['id_map'] = self.id_map
-        # {  # TODO: user configure
-        #     '28-00000b812382': 'beer',
-        #     '28-000008802d75': 'chamber'
-        # }
 
         return x
 

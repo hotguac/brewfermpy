@@ -355,7 +355,7 @@ if __name__ == '__main__':
             filename='./xchg.log',
             format=('%(asctime)s-%(process)d'
                     '-xchg.py -%(levelname)s-%(message)s'))
-        logging.debug("controller starting up")
+        logging.info("controller starting up")
 
         a = {"module": "test"}
         x = Xchg('./module-test.mmap', mode='w', default=a)

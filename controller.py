@@ -121,7 +121,7 @@ class BrewfermController():
         chambertuning = self.xd.get(paths.chamberPID)
 
         if (beertuning is None) or (chambertuning is None):
-            logging.debug(
+            logging.warning(
                 'beertuning = %s and chamber tuning = %s',
                 beertuning, chambertuning)
             self.desired_state = paths.paused

@@ -31,7 +31,6 @@ class BrewfermBlues:
     def update(self):
         scanner = btle.Scanner()
 
-        # logging.debug('Scanning for devices...')
         devices = scanner.scan(4)  # timeout in seconds
 
         for d in devices:

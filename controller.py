@@ -98,21 +98,24 @@ class BrewfermController():
         beer_temp = self.xd.get(paths.beer_temp)
         beer_target = self.xd.get(paths.beer_target)
 
-        if self.xd.get(paths.state, paths.paused) == paths.paused:
+        if (self.xd.get(paths.state, paths.paused) == paths.paused):
             self.desired_state = paths.paused
         else:
-            self.calculate()
-
-            if self.heat_cool > 80:
-                if ((beer_temp - beer_target) > 10):
-                    self.desired_state = paths.idle
-                else:
-                    self.desired_state = paths.heat
+            if (beer_temp is None):
+                self.desired_state = paths.paused
             else:
-                if self.heat_cool < 20:
-                    self.desired_state = paths.cool
+                self.calculate()
+
+                if self.heat_cool > 80:
+                    if ((beer_temp - beer_target) > 10):
+                        self.desired_state = paths.idle
+                    else:
+                        self.desired_state = paths.heat
                 else:
-                    self.desired_state = paths.idle
+                    if self.heat_cool < 20:
+                        self.desired_state = paths.cool
+                    else:
+                        self.desired_state = paths.idle
 
         beertuning = self.xd.get(paths.beerPID)
         chambertuning = self.xd.get(paths.chamberPID)

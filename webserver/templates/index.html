@@ -2,12 +2,42 @@
 
 <head>
     <title>{{ title }}</title>
+    <script>
+        function myFunction() {
+            const chamber = document.getElementById("chamber")
+            const current = document.getElementById("current")
+            const target = document.getElementById("target")
+            const sg = document.getElementById("sg")
+            const vsite = "{{ values_url }}/values"
+
+            fetch(vsite)
+                .then(response => response.json())
+                .then(json => {
+                    chamber.innerHTML = "<h2>Chamber Temp " + json.chamber + "</h2>";
+                    current.innerHTML = "<h2>Current Temp " + json.current + "</h2>";
+                    target.innerHTML = "<h2>Target Temp " + json.target + "</h2>";
+                    sg.innerHTML = "<h2>S.G. " + json.sg + "</h2>"
+                })
+                .catch(error => console.error(error))
+        }
+        document.addEventListener("DOMContentLoaded", function (event) {
+            setInterval(myFunction, 5000) // interval value in milliseconds
+        })
+    </script>
 </head>
 
 <body>
-    <h1>Brewferm</h1>
-    <h2>Current Temp {{ current }}</h2>
-    <h2>Specific Gravity {{ sg }}</h2>
+    <h1>{{ title }}</h1>
+    <div id="current">
+        <h2>Current Temp {{ current }}</h2>
+    </div>
+    <div id="target">
+        <h2>Target Temp {{ target }}</h2>
+    </div>
+    <div id="chamber">
+        <h2>Chamber Temp {{ chamber }}</h2>
+    </div>
+    <div id="sg">
+        <h2>S.G. {{ sg }}</h2>
+    </div>
 </body>
-
-</html>

@@ -1,7 +1,11 @@
 #!/usr/bin/python3
 
+"""
+the following command needs ran in the webserver directory
+openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+"""
+
 # Import standard libraries ---------------------------------------------------
-import logging
 import sys
 
 from flask import Flask, render_template, request
@@ -10,12 +14,15 @@ from flask import Flask, render_template, request
 sys.path.append('..')  # noqa: E402
 import paths
 from xchg import XchgData
+from logger import BrewfermLogger
 
-logging.basicConfig(
-    level=logging.DEBUG, filename=paths.logs,
-    format='%(asctime)s-%(process)d-webs.py -%(levelname)s-%(message)s')
 
-logging.info("webs starting up")
+"""
+Creates a rotating log
+"""
+logger = BrewfermLogger('webs.py').getLogger()
+
+logger.info("webs starting up")
 
 xd = XchgData()
 app = Flask(__name__)
@@ -58,16 +65,18 @@ def index():
 
 
 # Run Loop Here --------------------------------------------------------
-
 if __name__ == '__main__':
     try:
-        logging.debug("Inside main")
-        app.run(debug=False, host='0.0.0.0', port=8000)  # port=80 requires sudo to run!!
+        logger.debug("Inside main")
+        app.run(debug=False,
+                host='0.0.0.0',
+                port=8000,
+                ssl_context=('cert.pem', 'key.pem'))  # port=80 requires sudo to run!!
     except Exception as e:
-        logging.exception("Some other error %s %s", type(e), e)
+        logger.exception("Some other error %s %s", type(e), e)
         sys.exit(1)
     else:
-        logging.info("clean exit")
+        logger.info("clean exit")
         sys.exit(0)
 else:
     application = app

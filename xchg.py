@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import json
-import logging
 import mmap
 import sys
 
@@ -9,6 +8,13 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import paths
+from logger import BrewfermLogger
+
+
+"""
+Creates a rotating log
+"""
+logger = BrewfermLogger('xchg.py').getLogger()
 
 
 # --------------------------------------------------------------------
@@ -77,7 +83,7 @@ class XchgData():
             else:
                 return default
         except Exception as e:
-            logging.exception('%s %s', type(e), e)
+            logger.exception('%s %s', type(e), e)
 
     def get_blue(self):
         try:
@@ -89,7 +95,7 @@ class XchgData():
             if 'sg' in x.keys():
                 result = x['sg']
         except Exception as e:
-            logging.exception('%s %s', type(e), e)
+            logger.exception('%s %s', type(e), e)
 
         return result
 
@@ -104,7 +110,7 @@ class XchgData():
             if field_name in x.keys():
                 result = x[field_name]
         except Exception as e:
-            logging.exception("%s %s", type(e), e)
+            logger.exception("%s %s", type(e), e)
 
         return result
 
@@ -122,7 +128,7 @@ class XchgData():
             if field_name in x.keys():
                 result = x[field_name]
         except Exception as e:
-            logging.exception("%s %s", type(e), e)
+            logger.exception("%s %s", type(e), e)
             return None
         else:
             return result
@@ -140,7 +146,7 @@ class XchgData():
                 if field_name in x.keys():
                     result = x[field_name]
         except Exception as e:
-            logging.exception("%s %s", type(e), e)
+            logger.exception("%s %s", type(e), e)
 
         return result
 
@@ -153,7 +159,7 @@ class XchgData():
                 for ct in x.keys():
                     result = float(x[ct])
         except Exception as e:
-            logging.exception('%s %s', type(e), e)
+            logger.exception('%s %s', type(e), e)
             return None
         else:
             return result
@@ -165,7 +171,7 @@ class XchgData():
 
             result = self.sensors_out.read()
         except Exception as e:
-            logging.exception("%s %s", type(e), e)
+            logger.exception("%s %s", type(e), e)
 
         return result
 
@@ -180,14 +186,14 @@ class XchgData():
             if field_name in x.keys():
                 result = x[field_name]
         except Exception as e:
-            logging.exception("%s %s", type(e), e)
+            logger.exception("%s %s", type(e), e)
 
         return result
 
     def write_controller(self, value):
         try:
             if self.controller_mode != self.update_mode:
-                logging.debug(
+                logger.debug(
                     'attempted write to a file that opened ready only')
             else:
                 if self.controller_out is None:
@@ -197,12 +203,12 @@ class XchgData():
 
                 self.controller_out.write(value)
         except Exception as e:
-            logging.exception("%s %s", type(e), e)
+            logger.exception("%s %s", type(e), e)
 
     def write_gui(self, value):
         try:
             if self.gui_mode != self.update_mode:
-                logging.debug(
+                logger.debug(
                     'attempted write to a file that opened ready only')
             else:
                 if self.gui_out is None:
@@ -210,12 +216,12 @@ class XchgData():
 
                 self.gui_out.write(value)
         except Exception as e:
-            logging.exception("%s %s", type(e), e)
+            logger.exception("%s %s", type(e), e)
 
     def write_sensors(self, value):
         try:
             if self.sensors_mode != self.update_mode:
-                logging.debug(
+                logger.debug(
                     'attempted write to a file that opened ready only')
             else:
                 if self.sensors_out is None:
@@ -225,12 +231,12 @@ class XchgData():
 
                 self.sensors_out.write(value)
         except Exception as e:
-            logging.exception("%s %s", type(e), e)
+            logger.exception("%s %s", type(e), e)
 
     def write_relays(self, value):
         try:
             if self.relays_mode != self.update_mode:
-                logging.debug(
+                logger.debug(
                     'attempted write to a file that opened ready only')
             else:
                 if self.relays_out is None:
@@ -238,12 +244,12 @@ class XchgData():
 
                 self.relays_out.write(value)
         except Exception as e:
-            logging.exception("%s %s", type(e), e)
+            logger.exception("%s %s", type(e), e)
 
     def write_blue(self, value):
         try:
             if self.blue_mode != self.update_mode:
-                logging.debug(
+                logger.debug(
                     'attempted write to a file that opened ready only')
             else:
                 if self.blue_out is None:
@@ -251,7 +257,7 @@ class XchgData():
 
                 self.blue_out.write(value)
         except Exception as e:
-            logging.exception("%s %s", type(e), e)
+            logger.exception("%s %s", type(e), e)
 
 
 # -------------------------------------------------------
@@ -277,7 +283,7 @@ class Xchg():
         except FileNotFoundError:
             current_size = 0
         except Exception as e:
-            logging.exception('in create %s %s', type(e), e)
+            logger.exception('in create %s %s', type(e), e)
 
         try:
             if current_size != self.pad:
@@ -294,7 +300,7 @@ class Xchg():
                     f.write(y.encode('utf-8'))
                     f.close()
         except Exception as e:
-            logging.exception("mmap file create %s %s", type(e), e)
+            logger.exception("mmap file create %s %s", type(e), e)
 
     def read(self):
         try:
@@ -312,21 +318,21 @@ class Xchg():
         except ValueError:
             if self.last_warning_ts < (datetime.now() - timedelta(minutes=5)):
                 self.last_warning_ts = datetime.now()
-                logging.warning("empty mmap file '%s'", self.path)
+                logger.warning("empty mmap file '%s'", self.path)
             return {}
         except FileNotFoundError:
             if self.last_warning_ts < (datetime.now() - timedelta(minutes=5)):
                 self.last_warning_ts = datetime.now()
-                logging.info('mmap file %s not available yet', self.path)
+                logger.info('mmap file %s not available yet', self.path)
             return {}
         except Exception as e:
-            logging.exception("mmap file read %s %s", type(e), e)
+            logger.exception("mmap file read %s %s", type(e), e)
             sys.exit(1)
 
 # expects a dictionary object in info
     def write(self, info=None):
         if self.mode == 'r':
-            logging.exception('attempted write to Xchg opened as read')
+            logger.exception('attempted write to Xchg opened as read')
         try:
             info['ts'] = datetime.now().isoformat(sep=' ', timespec='seconds')
 
@@ -342,7 +348,7 @@ class Xchg():
             self.mm.flush()
 
         except Exception as e:
-            logging.exception("mmap write %s %s", type(e), e)
+            logger.exception("mmap write %s %s", type(e), e)
             raise(e)
 
 
@@ -350,12 +356,7 @@ class Xchg():
 if __name__ == '__main__':
     try:
         print('module test results in xchg.log')
-        logging.basicConfig(
-            level=logging.DEBUG,
-            filename='./xchg.log',
-            format=('%(asctime)s-%(process)d'
-                    '-xchg.py -%(levelname)s-%(message)s'))
-        logging.info("controller starting up")
+        logger.info("controller starting up")
 
         a = {"module": "test"}
         x = Xchg('./module-test.mmap', mode='w', default=a)
@@ -364,9 +365,9 @@ if __name__ == '__main__':
         b = None
         b = y.read()
         if a == b:
-            logging.info('test passed..')
+            logger.info('test passed..')
         else:
-            logging.exception("a = '%s' but b = '%s'", a, b)
+            logger.exception("a = '%s' but b = '%s'", a, b)
 
         a = None
         b = None
@@ -374,10 +375,10 @@ if __name__ == '__main__':
         x.write(a)
         b = y.read()
         if a == b:
-            logging.info('test2 passed..')
-            logging.info('module tests successful')
+            logger.info('test2 passed..')
+            logger.info('module tests successful')
         else:
-            logging.exception(" a = '%s' but b = '%s'", a, b)
+            logger.exception(" a = '%s' but b = '%s'", a, b)
 
     except Exception as e:
-        logging.exception("%s %s", type(e), e)
+        logger.exception("%s %s", type(e), e)

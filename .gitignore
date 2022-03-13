@@ -3,3 +3,4 @@ logs/*.log*
 xchg/*
 simple_pid.py
 webserver/__pycache__/*
+webserver/*.pem

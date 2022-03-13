@@ -5,10 +5,16 @@ import tkinter as tk
 import tkinter.font as font
 
 # Import standard libraries -----------------------------------------
-import logging
 
 # Import application libraries --------------------------------------
 import colors
+from logger import BrewfermLogger
+
+
+"""
+Creates a rotating log
+"""
+logger = BrewfermLogger('settings.py').getLogger()
 
 
 # -------------------------------------------------------------------
@@ -90,7 +96,7 @@ class gMenu(tk.Frame):
             self.after(500, self.update_ok)
 
         except Exception as e:
-            logging.exception("%s %s", type(e), e)
+            logger.exception("%s %s", type(e), e)
 
     def set_beer_target(self):
         self.hide()

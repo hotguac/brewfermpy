@@ -1,16 +1,21 @@
 #!/usr/bin/python3
 
 # Import standard libraries ---------------------------------------------------
-import logging
 import os
 import sys
-
 from time import sleep
 
 # Import application libraries ------------------------------------------------
 import killer
 import paths
 from xchg import XchgData
+from logger import BrewfermLogger
+
+
+"""
+Creates a rotating log
+"""
+logger = BrewfermLogger('sensors.py').getLogger()
 
 
 # Functions ------------------------------------------------------------
@@ -27,7 +32,7 @@ class BrewfermSensors:
         try:
             self.id_map = self.xd.get(paths.sensor_map, {})
         except Exception as e:
-            logging.exception('update_mapping %s %s', type(e), e)
+            logger.exception('update_mapping %s %s', type(e), e)
 
     def map_sensors(self, readings):
         result = {}
@@ -40,7 +45,7 @@ class BrewfermSensors:
                     count += 1
                     result['unknown_' + str(count)] = {id: readings[id]}
         except Exception as e:
-            logging.exception('map_sensors %s %s', type(e), e)
+            logger.exception('map_sensors %s %s', type(e), e)
 
         return result
 
@@ -49,7 +54,7 @@ class BrewfermSensors:
         if self.current_reading:
             self.xd.write_sensors(self.map_sensors(self.current_reading))
         else:
-            logging.warning('no sensors read')
+            logger.warning('no sensors read')
 
     def scan_sensors(self):
         self.current_reading = {}
@@ -62,7 +67,7 @@ class BrewfermSensors:
                         temp_f = (float(t1) * 9.0) / 5000 + 32.0
                         self.current_reading[candidate.name] = temp_f
         except Exception as e:
-            logging.exception('%s %s', type(e), e)
+            logger.exception('%s %s', type(e), e)
 
     def gettemp(self, id):
         try:
@@ -80,7 +85,7 @@ class BrewfermSensors:
                 mytemp = line.rsplit('t=', 1)[1]
             else:
                 mytemp = None
-                logging.error("CRC not valid for sensor id=%s", id)
+                logger.error("CRC not valid for sensor id=%s", id)
 
             f.close()
 
@@ -91,7 +96,7 @@ class BrewfermSensors:
         except IndexError:
             return None
         except Exception as e:
-            logging.exception(
+            logger.exception(
                 'reading one-wire interface for sensor id=%s : %s',
                 id,
                 e)
@@ -101,11 +106,7 @@ class BrewfermSensors:
 
 
 if __name__ == '__main__':
-    logging.basicConfig(
-        level=logging.DEBUG, filename=paths.logs,
-        format='%(asctime)s-%(process)d-sensors.py -%(levelname)s-%(message)s')
-
-    logging.info("sensors starting up")
+    logger.info("sensors starting up")
     try:
         mysensors = BrewfermSensors()
 
@@ -116,8 +117,8 @@ if __name__ == '__main__':
             sleep(mysensors.sleep_for())
 
     except Exception as e:
-        logging.exception("Some other error %s %s", type(e), e)
+        logger.exception("Some other error %s %s", type(e), e)
         sys.exit(1)
     else:
-        logging.info("clean exit")
+        logger.info("clean exit")
         sys.exit(0)

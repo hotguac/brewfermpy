@@ -3,7 +3,6 @@
 
 # Import standard libraries ---------------------------------------------------
 import atexit
-import logging
 import RPi.GPIO as GPIO
 import sys
 
@@ -15,6 +14,10 @@ from time import sleep
 import killer
 import paths
 from xchg import XchgData
+from logger import BrewfermLogger
+
+
+logger = BrewfermLogger('relays.py').getLogger()
 
 
 # Classes ------------------------------------------------------------
@@ -53,7 +56,7 @@ class BrewfermRelays:
         GPIO.setwarnings(True)
 
     def gpio_cleanup(self):
-        logging.info('releasing GPIO')
+        logger.info('releasing GPIO')
         GPIO.output(self.heat_pin, GPIO.LOW)
         GPIO.output(self.cool_pin, GPIO.LOW)
         GPIO.cleanup()
@@ -65,7 +68,6 @@ class BrewfermRelays:
             return self.cool_off
 
     def check_min_max(self, desired_state):
-        # logging.debug('current_state = %s desired = %s', self.current_state, desired_state)
         now = datetime.now()
         last_off = self.last_turned_off()
 
@@ -130,7 +132,7 @@ class BrewfermRelays:
             self.timeout = True
         else:
             if self.timeout:
-                logging.info('found controller output, resuming...')
+                logger.info('found controller output, resuming...')
                 self.timeout = False
                 self.sleep_time = 2
 
@@ -142,19 +144,19 @@ class BrewfermRelays:
             expired_ts = (datetime.now() - timedelta(minutes=20))
             ts = self.xd.get('desired_ts', default=str(expired_ts))
         except Exception as e:
-            logging.exception('input mmap not ready %s %s', type(e), e)
+            logger.exception('input mmap not ready %s %s', type(e), e)
             sys.exit(1)
         else:
             if self.timed_out(ts):
                 desired_state = paths.paused
                 if self.current_state != paths.paused:
-                    logging.warning('old or missing controller output, going to pause')
+                    logger.warning('old or missing controller output, going to pause')
 
             # do more checks here to see if timers passed for state change
             new_state = self.check_min_max(desired_state)
 
             if new_state != self.current_state:
-                logging.info('old = %s current = %s', self.current_state, new_state)
+                logger.info('old = %s current = %s', self.current_state, new_state)
                 self.current_state = new_state
 
             if self.current_state is None:
@@ -177,20 +179,14 @@ class BrewfermRelays:
 
             self.xd.write_relays({"current": self.current_state})
         except Exception as e:
-            logging.exception('%s %s', type(e), e)
+            logger.exception('%s %s', type(e), e)
             sys.exit(1)
 
 
 # main loop here
 if __name__ == '__main__':
     try:
-        logging.basicConfig(
-            level=logging.DEBUG, filename=paths.logs,
-            format=(
-                '%(asctime)s-%(process)d-relays.py  '
-                '-%(levelname)s-%(message)s'))
-
-        logging.info("relays starting up")
+        logger.info("relays starting up")
         myrelays = BrewfermRelays(12, 16)  # BCM pin 18
 
         atexit.register(myrelays.gpio_cleanup)
@@ -202,8 +198,8 @@ if __name__ == '__main__':
             sleep(myrelays.sleep_time)
 
     except Exception as e:
-        logging.exception("%s %s", type(e), e)
-
-sleep(10)
-logging.info('clean exit')
-sys.exit(0)
+        logger.exception("%s %s", type(e), e)
+    finally:
+        logger.info('clean exit')
+        sleep(4)
+        sys.exit(0)

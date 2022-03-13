@@ -1,4 +1,3 @@
-import logging
 import sys
 
 from time import sleep
@@ -11,6 +10,13 @@ from pid import BeerPID, ChamberPID
 from xchg import XchgData
 
 from datetime import timedelta, datetime
+from logger import BrewfermLogger
+
+
+"""
+Creates a rotating log
+"""
+logger = BrewfermLogger('controller.py').getLogger()
 
 
 # -------------------------------------------------------------------
@@ -25,7 +31,7 @@ class BrewfermController():
         beer_target = self.xd.get(paths.beer_target)
         chamber_temp = self.xd.get(paths.chamber_temp)
         if (chamber_temp is None) or (beer_target is None):
-            logging.info('not ready yet, exiting')
+            logger.info('not ready yet, exiting')
             sys.exit(0)
 
         self.beer_tuning = self.xd.get(paths.beerPID)
@@ -64,7 +70,7 @@ class BrewfermController():
             ts = datetime.now()
             if ts > (self.last_output + timedelta(minutes=2)):
                 self.last_output = ts
-                logging.info(
+                logger.info(
                     ' beer = c%.1f / t%.1f / I%.1f pi%s / st%s '
                     ' chamber = c%.1f / t%.1f / hc%.1f / I%.1f pi%s / st%s',
                     round(beer_temp, 2),
@@ -86,13 +92,13 @@ class BrewfermController():
                     round(self.chamberPID.pid.sample_time, 1)
                 )
         except Exception as e:
-            logging.exception("%s %s", type(e), e)
+            logger.exception("%s %s", type(e), e)
 
     def output_desired(self):
         try:
             self.xd.write_controller({paths.desired: self.desired_state})
         except Exception as e:
-            logging.exception("%s %s", type(e), e)
+            logger.exception("%s %s", type(e), e)
 
     def update(self):
         beer_temp = self.xd.get(paths.beer_temp)
@@ -121,7 +127,7 @@ class BrewfermController():
         chambertuning = self.xd.get(paths.chamberPID)
 
         if (beertuning is None) or (chambertuning is None):
-            logging.warning(
+            logger.warning(
                 'beertuning = %s and chamber tuning = %s',
                 beertuning, chambertuning)
             self.desired_state = paths.paused
@@ -142,13 +148,7 @@ class BrewfermController():
 # -------------------------------------------------------------------
 if __name__ == '__main__':
     try:
-        logging.basicConfig(
-            level=logging.DEBUG, filename=paths.logs,
-            format=(
-                '%(asctime)s-%(process)d-controller.py -'
-                '%(levelname)s-%(message)s'))
-
-        logging.info("controller starting up")
+        logger.info("controller starting up")
 
         mycontroller = BrewfermController()
         killer = killer.GracefulKiller()
@@ -157,8 +157,8 @@ if __name__ == '__main__':
             mycontroller.update()
             sleep(4)
 
-        logging.info('shutting down')
+        logger.info('shutting down')
         sys.exit(0)
 
     except Exception as e:
-        logging.exception("%s %s", type(e), e)
+        logger.exception("%s %s", type(e), e)

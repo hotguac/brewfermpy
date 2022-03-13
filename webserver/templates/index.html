@@ -2,6 +2,7 @@
 
 <head>
     <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <script>
         function myFunction() {
             const chamber = document.getElementById("chamber")
@@ -14,7 +15,7 @@
                 .then(response => response.json())
                 .then(json => {
                     chamber.innerHTML = "<h2>Chamber Temp " + json.chamber + "</h2>";
-                    current.innerHTML = "<h2>Current Temp " + json.current + "</h2>";
+                    current.innerHTML = "<h3>" + json.current + "</h3>";
                     target.innerHTML = "<h2>Target Temp " + json.target + "</h2>";
                     sg.innerHTML = "<h2>S.G. " + json.sg + "</h2>"
                 })
@@ -28,15 +29,19 @@
 
 <body>
     <h1>{{ title }}</h1>
-    <div id="current">
-        <h2>Current Temp {{ current }}</h2>
+    <h2>Current Temp</h2>
+    <div id="current" class="box">
+        <h3>{{ current }}</h3>
     </div>
+    
     <div id="target">
         <h2>Target Temp {{ target }}</h2>
     </div>
+
     <div id="chamber">
         <h2>Chamber Temp {{ chamber }}</h2>
     </div>
+
     <div id="sg">
         <h2>S.G. {{ sg }}</h2>
     </div>

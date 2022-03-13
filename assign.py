@@ -3,16 +3,21 @@
 # Import 3rd party libraries ----------------------------------------
 import tkinter as tk
 import tkinter.font as font
-# import tkFont
 
 # Import standard libraries -----------------------------------------
-import logging
 
 # Import application libraries --------------------------------------
 import colors
 import paths
 
 from xchg import XchgData
+from logger import BrewfermLogger
+
+
+"""
+Creates a rotating log
+"""
+logger = BrewfermLogger('assign.py').getLogger()
 
 
 # -------------------------------------------------------------------
@@ -61,7 +66,7 @@ class gAssign(tk.Frame):
                             self.id3['text'] = x
                             self.temp3['text'] = str(round(self.sensors_raw[id][x]))
         except Exception as e:
-            logging.exception('%s', e)
+            logger.exception('%s', e)
 
     def create_widgets(self):
         normal_font = font.Font(family='DejaVu Sans Mono', size=-36)  # , weight='bold')
@@ -230,7 +235,7 @@ class gAssign(tk.Frame):
             self.master.id_map = new_map
             self.master.update_out(reschedule=False)
         except Exception as e:
-            logging.exception('%s', e)
+            logger.exception('%s', e)
 
     def store1(self):
         try:
@@ -240,7 +245,7 @@ class gAssign(tk.Frame):
             else:
                 self.func1['text'] = 'spare'
         except Exception as e:
-            logging.exception('%s', e)
+            logger.exception('%s', e)
 
     def store2(self):
         try:
@@ -250,7 +255,7 @@ class gAssign(tk.Frame):
             else:
                 self.func2['text'] = 'spare'
         except Exception as e:
-            logging.exception('%s', e)
+            logger.exception('%s', e)
 
     def store3(self):
         try:
@@ -260,7 +265,7 @@ class gAssign(tk.Frame):
             else:
                 self.func3['text'] = 'spare'
         except Exception as e:
-            logging.exception('%s', e)
+            logger.exception('%s', e)
 
     def hide(self):
         self.id1.place(x=0, y=0, height=0, width=0)

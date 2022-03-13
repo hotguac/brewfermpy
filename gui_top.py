@@ -4,13 +4,18 @@
 import tkinter as tk
 
 # Import standard libraries ---------------------------------------------------
-import logging
-
 from datetime import datetime
 
 # Import application libraries ------------------------------------------------
 import colors
 import paths
+from logger import BrewfermLogger
+
+
+"""
+Creates a rotating log
+"""
+logger = BrewfermLogger('gui_top.py').getLogger()
 
 
 class gTop(tk.Frame):
@@ -28,7 +33,7 @@ class gTop(tk.Frame):
                 self.last_time = dt
             self.date_time.after(500, self.update_time)
         except Exception as e:
-            logging.exception("%s %s", type(e), e)
+            logger.exception("%s %s", type(e), e)
 
     def create_widgets(self):
         #

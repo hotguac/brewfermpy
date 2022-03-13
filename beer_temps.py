@@ -5,13 +5,19 @@ import tkinter as tk
 import tkinter.font as font
 
 # Import standard libraries -----------------------------------------
-import logging
 
 # Import application libraries --------------------------------------
 import colors
 import paths
 
 from xchg import XchgData
+from logger import BrewfermLogger
+
+
+"""
+Creates a rotating log
+"""
+logger = BrewfermLogger('beer_temps.py').getLogger()
 
 
 # -------------------------------------------------------------------
@@ -121,7 +127,7 @@ class gBeerTemps(tk.Frame):
                 self.target['text'] = str(round(beer_target))
 
         except Exception as e:
-            logging.exception("%s %s", type(e), e)
+            logger.exception("%s %s", type(e), e)
 
     def plus_one(self):
         self.master.beer_target += 1.0

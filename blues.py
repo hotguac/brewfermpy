@@ -7,7 +7,6 @@ from bluepy import btle
 # use bluetoothctl program to turn 'scan on'
 
 # Import standard libraries ---------------------------------------------------
-import logging
 import sys
 
 from time import sleep
@@ -16,12 +15,19 @@ from time import sleep
 import killer
 import paths
 from xchg import XchgData
+from logger import BrewfermLogger
+
+
+"""
+Creates a rotating log
+"""
+logger = BrewfermLogger('blues.py').getLogger()
 
 
 # Classes ------------------------------------------------------------
 class BrewfermBlues:
     def __init__(self):
-        self.sleep_time = 120  # in seconds
+        self.sleep_time = 20  # in seconds
         self.uuid = None
         self.temp = None
         self.sg = None
@@ -43,27 +49,33 @@ class BrewfermBlues:
 
     def implement_current(self):
         readings = {}
-        sg = str(int(self.sg, 16))
-        if int(self.sg, 16) >= 1000:
-            readings['sg'] = '1.' + sg[1:4]
+        self.beacon_found = False
+        try:
+            sg = str(int(self.sg, 16))
+        except TypeError:
+            if self.beacon_found:
+                logger.warning('no tilt found')
+
+            self.beacon_found = False
         else:
-            readings['sg'] = '0.' + sg[1:4]
+            if not self.beacon_found:
+                logger.info('tilt found')
 
-        readings['sgr'] = int(self.sg, 16)
-        readings['temp'] = int(self.temp, 16)
+            self.beacon_found = True
+            if int(self.sg, 16) >= 1000:
+                readings['sg'] = '1.' + sg[1:4]
+            else:
+                readings['sg'] = '0.' + sg[1:4]
 
-        self.xd.write_blue(readings)
+            readings['sgr'] = int(self.sg, 16)
+            readings['temp'] = int(self.temp, 16)
+
+            self.xd.write_blue(readings)
 
 
 if __name__ == "__main__":
     try:
-        logging.basicConfig(
-            level=logging.DEBUG, filename=paths.logs,
-            format=(
-                '%(asctime)s-%(process)d-blue.py  '
-                '-%(levelname)s-%(message)s'))
-
-        logging.info("blues starting up")
+        logger.info("blues starting up")
         myblues = BrewfermBlues()
 
         killer = killer.GracefulKiller()
@@ -74,18 +86,18 @@ if __name__ == "__main__":
                 myblues.update()
                 myblues.implement_current()
                 if not_ready:
-                    logging.info('bluetooth ready')
+                    logger.info('bluetooth ready')
                     not_ready = False
 
             except btle.BTLEManagementError:
                 not_ready = True
-                logging.warning('bluetooth not ready')
+                logger.warning('bluetooth not ready')
 
             sleep(myblues.sleep_time)
 
     except Exception as e:
-        logging.exception("%s %s", type(e), e)
+        logger.exception("%s %s", type(e), e)
 
 sleep(10)
-logging.info('clean exit')
+logger.info('clean exit')
 sys.exit(0)

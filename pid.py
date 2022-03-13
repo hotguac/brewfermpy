@@ -2,12 +2,16 @@
 # """ PID clases configured for the beer and the chamber """
 
 # Import standard libraries ---------------------------------------------------
-import logging
-
 from simple_pid import PID
 
 # Import application libraries ------------------------------------------------
-import paths
+from logger import BrewfermLogger
+
+
+"""
+Creates a rotating log
+"""
+logger = BrewfermLogger('pid.py').getLogger()
 
 
 # Classes ------------------------------------------------------------
@@ -53,7 +57,7 @@ class BeerPID:
         high_limit = self.pid.output_limits[1]
         self.pid.output_limits = low_limit, high_limit
 
-        # logging.info('current = %s limits = %s', current_temp, self.pid.output_limits)
+        # logger.info('current = %s limits = %s', current_temp, self.pid.output_limits)
         return self.pid(current_temp)
 
     def change_target(self, setpoint):
@@ -73,7 +77,7 @@ class BeerPID:
             self.pid._integral = setpoint
             self.pid._last_output = setpoint
 
-        logging.info(
+        logger.info(
             'new beer target %s with limits %s',
             self.pid.setpoint,
             self.pid.output_limits
@@ -88,7 +92,7 @@ class BeerPID:
             x['sample_time'] = self.pid.sample_time
             return x
         except Exception as e:
-            logging.exception('%s %s', type(e), e)
+            logger.exception('%s %s', type(e), e)
 
     def set_tuning(self, new_settings):
         try:
@@ -106,7 +110,7 @@ class BeerPID:
             if new_settings.get('sample_time') is not None:
                 self.pid.sample_time = new_settings['sample_time']
         except Exception as e:
-            logging.exception('%s %s', type(e), e)
+            logger.exception('%s %s', type(e), e)
 
 
 class ChamberPID:
@@ -139,7 +143,7 @@ class ChamberPID:
             x['sample_time'] = self.pid.sample_time
             return x
         except Exception as e:
-            logging.exception('%s %s', type(e), e)
+            logger.exception('%s %s', type(e), e)
 
     def set_tuning(self, new_settings):
         try:
@@ -158,20 +162,14 @@ class ChamberPID:
                 self.pid.sample_time = new_settings['sample_time']
 
         except Exception as e:
-            logging.exception('%s %s', type(e), e)
+            logger.exception('%s %s', type(e), e)
 
 
 # main loop here
 if __name__ == '__main__':
     try:
-        logging.basicConfig(
-            level=logging.DEBUG, filename=paths.logs,
-            format=(
-                '%(asctime)s-%(process)d-pid.py  '
-                '-%(levelname)s-%(message)s'))
-
-        logging.info("running BrewfermPID module tests")
-        logging.info("finished BrewfermPID module tests")
+        logger.info("running BrewfermPID module tests")
+        logger.info("finished BrewfermPID module tests")
 
     except Exception as e:
-        logging.exception("%s %s", type(e), e)
+        logger.exception("%s %s", type(e), e)

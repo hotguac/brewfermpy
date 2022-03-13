@@ -4,21 +4,25 @@
 import tkinter as tk
 import tkinter.font as tkFont
 
-# import tkFont
-
 # Import standard libraries ---------------------------------------------------
-import logging
 import os
 import signal
 import sys
 
 # Import application libraries ------------------------------------------------
 import colors
-import paths
 
 from gui_top import gTop
 from gui_middle import gMiddle
 from gui_bottom import gBottom
+
+from logger import BrewfermLogger
+
+
+"""
+Creates a rotating log
+"""
+logger = BrewfermLogger('gui.py').getLogger()
 
 
 # Functions -------------------------------------------------------------------
@@ -26,12 +30,12 @@ from gui_bottom import gBottom
 # so we can run the GUI
 def check_display():
     if os.environ.get('DISPLAY', '') == '':
-        logging.warning('no display found. Using :0.0')
+        logger.warning('no display found. Using :0.0')
         os.environ.__setitem__('DISPLAY', ':0.0')
 
 
 def closing_time(self, *args):
-    logging.info("shutting down")
+    logger.info("shutting down")
     if tg is not None:
         tg.quit()
     if gm is not None:
@@ -44,11 +48,7 @@ def closing_time(self, *args):
 
 
 # App -------------------------------------------------------------------------
-logging.basicConfig(
-    level=logging.DEBUG,
-    filename=paths.logs,
-    format='%(asctime)s-%(process)d-gui.py     -%(levelname)s - %(message)s')
-logging.info("gui starting up")
+logger.info("gui starting up")
 
 try:
     check_display()
@@ -62,17 +62,17 @@ try:
 
     root.update_idletasks()
 except tk.TclError:
-    logging.info("exiting, display not ready yet...")
+    logger.info("exiting, display not ready yet...")
     sys.exit(0)
 except Exception as e:
-    logging.exception("%s %s", type(e), e)
+    logger.exception("%s %s", type(e), e)
     sys.exit(1)
 else:
-    logging.info(
+    logger.info(
         "Canvas Size = height %d and width %d",
         root.winfo_height(),
         root.winfo_width())
-    logging.info('Available fonts=%s', tkFont.names())
+    logger.info('Available fonts=%s', tkFont.names())
 
 #
 #   Widgets -----------------------------------
@@ -82,7 +82,7 @@ try:
     gm = gMiddle(master=root)
     bg = gBottom(master=root)
 except Exception as e:
-    logging.exception("%s %s", type(e), e)
+    logger.exception("%s %s", type(e), e)
 
 #
 #   Display -----------------------------------
@@ -90,6 +90,6 @@ except Exception as e:
 try:
     root.mainloop()
 except Exception as e:
-    logging.exception("%s %s", type(e), e)
+    logger.exception("%s %s", type(e), e)
 
 sys.exit(0)

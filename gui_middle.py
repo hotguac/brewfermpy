@@ -5,7 +5,6 @@ import tkinter as tk
 import tkinter.font as font
 
 # Import standard libraries -----------------------------------------
-import logging
 
 # Import application libraries --------------------------------------
 import assign
@@ -17,6 +16,13 @@ import paths
 import settings
 
 from xchg import XchgData
+from logger import BrewfermLogger
+
+
+"""
+Creates a rotating log
+"""
+logger = BrewfermLogger('gui_middle.py').getLogger()
 
 
 # ------------------------------------------------
@@ -187,7 +193,7 @@ class gMiddle(tk.Frame):
 
             self.xd.write_gui(self.format_state())
         except Exception as e:
-            logging.exception('%s %s', type(e), e)
+            logger.exception('%s %s', type(e), e)
 
     def format_state(self):
         x = {}
@@ -222,19 +228,19 @@ class gMiddle(tk.Frame):
     def pause_brew(self):
         try:
             if self.pause_button['text'] == "Pause":
-                logging.warning("brewing paused...")
+                logger.warning("brewing paused...")
                 self.state = paths.paused
                 self.pause_button['text'] = "Resume"
             else:
-                logging.info("brewing resumed...")
+                logger.info("brewing resumed...")
                 self.pause_button['text'] = "Pause"
                 self.state = paths.running
 
         except Exception as e:
-            logging.exception(e)
+            logger.exception(e)
 
     def exit_brew(self):
-        logging.info("exiting gui")
+        logger.info("exiting gui")
         self.master.destroy()
 
     def settings(self):
@@ -255,4 +261,4 @@ class gMiddle(tk.Frame):
                     self.btemps.show_beer()
 
         except Exception as e:
-            logging.exception("settings %s %s", type(e), e)
+            logger.exception("settings %s %s", type(e), e)

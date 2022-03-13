@@ -1,0 +1,43 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color:#F0F0F0;
+  }
+ 
+  /*
+   * Centering the body content
+   */
+
+   /*
+  .container {
+    width: 1200px;
+    margin: 0 auto;
+  }
+  */
+  
+  h1 {
+    margin-top: 0px;
+    padding: 60px 30px 40px 30px;
+    font-size: 4em;
+    text-align: center;
+    letter-spacing: 2px;
+    color: #FAEEFA;
+    background-color:#307030;
+  }
+ 
+  h2 {
+    font-size: 3em;
+    margin-top: 10px;
+    text-align: center;
+    letter-spacing: -2px;
+  }
+
+  h3 {
+    font-size: 3em;
+    margin-top: 10px;
+    text-align: center;
+    letter-spacing: 2px;
+    color: #FAEEFA;
+    background-color:#132d2e;
+  }

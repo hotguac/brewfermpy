@@ -24,6 +24,7 @@ class BrewfermSensors:
         self.xd = XchgData(paths.sensors_out)
         self.current_reading = {}
         self.sleep_time = 4  # seconds
+        self.read_good = True
 
     def sleep_for(self):
         return self.sleep_time
@@ -53,8 +54,13 @@ class BrewfermSensors:
         self.scan_sensors()
         if self.current_reading:
             self.xd.write_sensors(self.map_sensors(self.current_reading))
+            if not self.read_good:
+                logger.info('sensors read')
+                self.read_good = True
         else:
-            logger.warning('no sensors read')
+            if self.read_good:
+                logger.warning('no sensors read')
+                self.read_good = False
 
     def scan_sensors(self):
         self.current_reading = {}

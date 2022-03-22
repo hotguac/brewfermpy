@@ -155,11 +155,11 @@ class gBeerTemps(tk.Frame):
         self.colder.place(x=0, y=0, height=0, width=0)
         self.colder10.place(x=0, y=0, height=0, width=0)
 
-        self.current.place(x=160, y=80, height=200, width=320)
-        self.target.place(x=580, y=120, height=100, width=160)
+        self.current.place(x=160, y=60, height=200, width=320)
+        self.target.place(x=580, y=100, height=100, width=160)
 
     def show_target(self):
-        self.current.place(x=160, y=80, height=0, width=0)
+        self.current.place(x=0, y=0, height=0, width=0)
 
         self.warmer.place(x=160, y=80, height=80, width=80)
         self.colder.place(x=160, y=180, height=80, width=80)

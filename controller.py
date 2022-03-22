@@ -6,17 +6,20 @@ from time import sleep
 import killer
 import paths
 
-from pid import BeerPID, ChamberPID
-from xchg import XchgData
-
-from datetime import timedelta, datetime
+"""
+Creates a rotating log, must be done prior
+to import from pic or xchg in order for the
+rotating function to work correctly.
+Use   # noqa: E402 to have flake ignore module level
+import after the 'logger = ' statement.
+"""
 from logger import BrewfermLogger
-
-
-"""
-Creates a rotating log
-"""
 logger = BrewfermLogger('controller.py').getLogger()
+
+from pid import BeerPID, ChamberPID  # noqa: E402
+from xchg import XchgData  # noqa: E402
+
+from datetime import timedelta, datetime  # noqa: E402
 
 
 # -------------------------------------------------------------------

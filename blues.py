@@ -31,6 +31,7 @@ class BrewfermBlues:
         self.uuid = None
         self.temp = None
         self.sg = None
+        self.beacon_found = False
 
         self.xd = XchgData(paths.blue_out)
 
@@ -49,7 +50,6 @@ class BrewfermBlues:
 
     def implement_current(self):
         readings = {}
-        self.beacon_found = False
         try:
             sg = str(int(self.sg, 16))
         except TypeError:

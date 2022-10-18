@@ -7,7 +7,7 @@ User=pi
 Group=pi
 ExecStart=/bin/bash -c '/usr/bin/python3 /home/pi/brewferm/controller.py > /home/pi/brewferm/logs/controller.log 2>&1'
 Restart=always
-RestartSec=30s
+RestartSec=120s
 KillMode=process
 TimeoutSec=infinity
 

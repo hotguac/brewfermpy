@@ -40,7 +40,7 @@ class BrewfermRelays:
         self.current_state = paths.idle
 
         self.off_on = 6  # minutes
-        self.max_on = 7  # minutes
+        self.max_on = 12  # minutes
         self.min_on = 1  # minutes
 
         self.hc_balance = 6  # multiply times for heat

@@ -10,11 +10,12 @@ It has the capability to control the temperature of the beer within 0.1F, althou
 sudo apt install bluetooth libbluetooth-dev libglib2.0-dev
 sudo pip3 install bluepy
 
-sudo apt install nginx python3-flask
+sudo apt install nginx python3-flask uwsgi
 sudo pip3 install gattlib glib-2.0
 sudo pip3 install mariadb
 sudo pip3 install simple-pid
-sudo pip3 install flask uwsgi
+sudo pip3 install flask 
+sudo pip3 install uwsgi
 
 sudo cp services/brewferm-*.service /lib/systemd/system/
 

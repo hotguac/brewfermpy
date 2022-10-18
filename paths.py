@@ -17,10 +17,12 @@ chamberPID = 'chamberPID'
 current = 'current'
 desired = 'desired'
 
+ambient_temp = 'ambient_temp'
 beer_temp = 'beer_temp'
 beer_target = 'beer_target'
 chamber_temp = 'chamber_temp'
 blue_sg = 'blue_sg'
+blue_ts = 'blue_ts'
 
 idle = 'Idle'
 cool = 'Cool'
@@ -37,7 +39,7 @@ chamber_sensor = 'Chamber'
 ambient_sensor = 'Ambient'
 spare_sensor = 'Spare'
 
-action_settings = 'Settings'
+action_menu = 'Menu'
 action_back = 'Back'
 
 sensor_map = 'sensor_map'
@@ -47,7 +49,7 @@ desired_ts = 'desired_ts'
 sensors_raw = 'sensors_raw'
 
 default_beerP = 8.0
-default_beerI = 0.0015
+default_beerI = 0.003 # 0.0015
 default_beerD = 0
 
 default_chamberP = 6.0

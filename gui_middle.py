@@ -10,6 +10,7 @@ import tkinter.font as font
 import assign
 import beer_temps
 import bpid
+import calibrate
 import cpid
 import colors
 import paths
@@ -36,6 +37,7 @@ class gMiddle(tk.Frame):
         self.btemps = None  # will hold a gBeerTemps object
         self.menu = None  # will hold a gMenu object
         self.sensor_assign = None  # will hold a gAssign object
+        self.sensor_calibrate = None  # will hold a gCalibrate object
         self.bpid_settings = None  # will hold a gBPID object
         self.cpid_settings = None  # will hold a gCPID object
 
@@ -116,7 +118,7 @@ class gMiddle(tk.Frame):
 
         self.settings_button = tk.Button(
             self.button_box,
-            text="Settings",
+            text="Menu",
             command=self.settings,
             background=colors.normal_button,
             borderwidth=0,
@@ -185,6 +187,9 @@ class gMiddle(tk.Frame):
             if self.sensor_assign is None:
                 self.sensor_assign = assign.gAssign(master=self)
 
+            if self.sensor_calibrate is None:
+                self.sensor_calibrate = calibrate.gCalibrate(master=self)
+
             if self.bpid_settings is None:
                 self.bpid_settings = bpid.gBPID(master=self)
 
@@ -245,13 +250,13 @@ class gMiddle(tk.Frame):
 
     def settings(self):
         try:
-            if self.settings_button['text'] == paths.action_settings:
+            if self.settings_button['text'] == paths.action_menu:
                 self.settings_button['text'] = paths.action_back
                 self.btemps.hide()
                 self.menu.show()
             else:
                 if self.settings_button['text'] == paths.action_back:
-                    self.settings_button['text'] = paths.action_settings
+                    self.settings_button['text'] = paths.action_menu
 
                     self.menu.hide()
                     self.sensor_assign.hide()

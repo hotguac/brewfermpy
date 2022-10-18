@@ -48,8 +48,23 @@ class gMenu(tk.Frame):
 
         self.sensor_assign = tk.Button(
             self.master.values_box,
-            text="Assign Sensors",
+            text="Assign",
             command=self.assign_sensors,
+            foreground=colors.background,
+            background=colors.normal50,
+            borderwidth=0,
+            highlightthickness=0,
+            font=self.button_font,
+            activebackground=colors.normal_button,
+            highlightbackground=colors.normal_button,
+            highlightcolor=colors.normal_button,
+            relief=tk.FLAT
+            )
+
+        self.sensor_calibrate = tk.Button(
+            self.master.values_box,
+            text="Calibrate",
+            command=self.calibrate_sensors,
             foreground=colors.background,
             background=colors.normal50,
             borderwidth=0,
@@ -106,6 +121,10 @@ class gMenu(tk.Frame):
         self.hide()
         self.master.sensor_assign.show()
 
+    def calibrate_sensors(self):
+        self.hide()
+        self.master.sensor_calibrate.show()
+
     def set_beer_pid(self):
         self.hide()
         self.master.bpid_settings.show()
@@ -117,11 +136,14 @@ class gMenu(tk.Frame):
     def hide(self):
         self.target.place(x=0, y=0, height=0, width=0)
         self.sensor_assign.place(x=0, y=0, height=0, width=0)
+        self.sensor_calibrate.place(x=0, y=0, height=0, width=0)
         self.bPIDsettings.place(x=0, y=0, height=0, width=0)
         self.cPIDsettings.place(x=0, y=0, height=0, width=0)
 
     def show(self):
-        self.target.place(x=180, y=60, height=80, width=200)
-        self.sensor_assign.place(x=440, y=60, height=80, width=200)
-        self.bPIDsettings.place(x=180, y=160, height=80, width=200)
-        self.cPIDsettings.place(x=440, y=160, height=80, width=200)
+        self.target.place(x=150, y=60, height=60, width=180)
+        self.bPIDsettings.place(x=370, y=60, height=60, width=180)
+        self.cPIDsettings.place(x=590, y=60, height=60, width=180)
+
+        self.sensor_assign.place(x=150, y=140, height=60, width=180)
+        self.sensor_calibrate.place(x=370, y=140, height=60, width=180)

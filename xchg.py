@@ -64,13 +64,15 @@ class XchgData():
                 paths.desired_ts: lambda: self.get_controller('ts'),
                 paths.chamber_temp: lambda: self.get_temp('chamber'),
                 paths.beer_temp: lambda: self.get_temp('beer'),
+                paths.ambient_temp: lambda: self.get_temp('ambient'),
                 paths.beer_target: lambda: self.get_gui('beer_target'),
                 paths.beerPID: lambda: self.get_gui('beer_pid'),
                 paths.chamberPID: lambda: self.get_gui('chamber_pid'),
                 paths.state: lambda: self.get_gui('state'),
                 paths.sensor_map: lambda: self.get_gui('id_map'),
                 paths.sensors_raw: lambda: self.get_sensors_raw(),
-                paths.blue_sg: lambda: self.get_blue()
+                paths.blue_sg: lambda: self.get_blue(),
+                paths.blue_ts: lambda: self.get_blue_ts()
             }
 
             result = switcher.get(field_name)  # returns a function object
@@ -94,6 +96,20 @@ class XchgData():
             result = None
             if 'sg' in x.keys():
                 result = x['sg']
+        except Exception as e:
+            logger.exception('%s %s', type(e), e)
+
+        return result
+
+    def get_blue_ts(self):
+        try:
+            if self.blue_out is None:
+                self.blue_out = Xchg(paths.blue_out, self.blue_mode)
+
+            x = self.blue_out.read()
+            result = None
+            if 'ts' in x.keys():
+                result = x['ts']
         except Exception as e:
             logger.exception('%s %s', type(e), e)
 

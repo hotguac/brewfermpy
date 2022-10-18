@@ -16,12 +16,13 @@ import paths
 from xchg import XchgData
 from logger import BrewfermLogger
 
+from datetime import timedelta, datetime
+from dateutil import parser
 
 """
 Creates a rotating log
 """
 logger = BrewfermLogger('webs.py').getLogger()
-
 logger.info("webs starting up")
 
 xd = XchgData()
@@ -34,6 +35,18 @@ def values():
     target = xd.get(paths.beer_target)
     chamber = xd.get(paths.chamber_temp)
     sg = xd.get(paths.blue_sg)
+
+    try:
+        sg_ts = xd.get(paths.blue_ts)
+
+        expired_ts = (datetime.now() - timedelta(minutes=2))
+        last_update = parser.parse(sg_ts)
+
+        if (last_update < expired_ts):
+            sg = '0.000'
+    except Exception as e:
+        logger.exception("Some other error %s %s", type(e), e)
+
 
     templateData = {
         'title': 'Brewferm Controller',

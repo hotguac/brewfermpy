@@ -70,6 +70,7 @@ class XchgData():
                 paths.chamberPID: lambda: self.get_gui('chamber_pid'),
                 paths.state: lambda: self.get_gui('state'),
                 paths.sensor_map: lambda: self.get_gui('id_map'),
+                paths.calibrations: lambda: self.get_gui('calibrations'),
                 paths.sensors_raw: lambda: self.get_sensors_raw(),
                 paths.blue_sg: lambda: self.get_blue(),
                 paths.blue_ts: lambda: self.get_blue_ts()

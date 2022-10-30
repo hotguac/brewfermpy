@@ -74,6 +74,7 @@ class gMiddle(tk.Frame):
         }
 
         self.id_map = self.xd.get(paths.sensor_map, temp_map)
+        self.calibrations = self.xd.get(paths.calibrations, {})
 
         self.create_widgets()
         self.after(1000, self.update_out)
@@ -227,6 +228,7 @@ class gMiddle(tk.Frame):
         }
 
         x['id_map'] = self.id_map
+        x['calibrations'] = self.calibrations
 
         return x
 

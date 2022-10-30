@@ -43,6 +43,7 @@ action_menu = 'Menu'
 action_back = 'Back'
 
 sensor_map = 'sensor_map'
+calibrations = 'calibrations'
 relays_ts = 'relays_ts'
 desired_ts = 'desired_ts'
 

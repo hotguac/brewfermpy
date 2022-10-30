@@ -4,3 +4,5 @@ xchg/*
 simple_pid.py
 webserver/__pycache__/*
 webserver/*.pem
+*.mmap
+todo.txt

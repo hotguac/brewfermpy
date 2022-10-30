@@ -30,8 +30,8 @@ class BeerPID:
             low_limit = 34
 
         high_limit = setpoint + 4
-        if high_limit > 84:
-            high_limit = 84
+        if high_limit > 94:
+            high_limit = 94
 
         self.pid = PID(
             Kp=self.kp,

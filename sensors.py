@@ -43,6 +43,7 @@ class BrewfermSensors:
                 if id in self.id_map:
                     result[self.id_map[id]] = {id: readings[id]}
                 else:
+                    logger.debug('not found id = %s', id)
                     count += 1
                     result['unknown_' + str(count)] = {id: readings[id]}
         except Exception as e:

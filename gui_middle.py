@@ -262,6 +262,7 @@ class gMiddle(tk.Frame):
                     self.sensor_assign.hide()
                     self.bpid_settings.hide()
                     self.cpid_settings.hide()
+                    self.sensor_calibrate.hide()
 
                     self.btemps.show_beer()
 

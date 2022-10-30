@@ -315,22 +315,27 @@ class gCalibrate(tk.Frame):
             relief=tk.FLAT
             )
 
-        self.back_button = tk.Button(
-            self.master.button_box,
-            text="Test",
-            command=self.settings,
-            background=colors.normal_button,
-            borderwidth=0,
-            highlightthickness=0,
-            font=self.button_font,
-            activebackground=colors.normal_button,
-            highlightbackground=colors.normal_button,
-            highlightcolor=colors.normal_button,
-            relief=tk.FLAT
-            )
+        # self.back_button = tk.Button(
+        #     self.master.button_box,
+        #     text="Back",
+        #     command=self.settings,
+        #     background=colors.normal_button,
+        #     borderwidth=0,
+        #     highlightthickness=0,
+        #     font=normal_font, # self.button_font,
+        #     activebackground=colors.normal_button,
+        #     highlightbackground=colors.normal_button,
+        #     highlightcolor=colors.normal_button,
+        #     relief=tk.FLAT
+        #     )
 
     def settings(self):
-        logger.debug('settings')
+        try:
+            self.hide()
+            self.master.settings()
+            logger.debug('settings')
+        except Exception as e:
+            logger.exception('%s', e)
 
     def use_new_map(self):
         try:
@@ -342,8 +347,15 @@ class gCalibrate(tk.Frame):
             if (self.func3['text'] != 'spare') and (self.id3['text'] != ''):
                 new_map[self.id3['text']] = self.func3['text']
 
-            self.master.id_map = new_map
-            self.master.update_out(reschedule=False)
+            
+            # TODO: uncomment after testing.
+            logger.debug('use_new_map: %s', new_map)
+            # reinstate when ready to test
+
+
+
+            # self.master.id_map = new_map
+            # self.master.update_out(reschedule=False)
         except Exception as e:
             logger.exception('%s', e)
 
@@ -397,6 +409,9 @@ class gCalibrate(tk.Frame):
         except Exception as e:
             logger.exception('%s', e)
 
+    def get_new_function(self, slot, current_text):
+        return current_text
+
     def hide(self):
         self.id1.place(x=0, y=0, height=0, width=0)
         self.id2.place(x=0, y=0, height=0, width=0)
@@ -426,7 +441,7 @@ class gCalibrate(tk.Frame):
         self.clear_saved.place(x=0, y=0, height=0, width=0)
         self.write_offsets.place(x=0, y=0, height=0, width=0)
 
-        self.back_button.place(x=0, y=0, height=0, width=0)
+        # self.back_button.place(x=0, y=0, height=0, width=0)
 
     def show(self):
         self.sensor_map = self.xd.get(paths.sensor_map)

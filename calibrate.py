@@ -61,7 +61,6 @@ class gCalibrate(tk.Frame):
 
         slot = 0
         try:
-            logger.debug('sensors_raw = %s', self.sensors_raw)
             for id in self.sensors_raw:
                 if id == 'ts':
                     continue
@@ -307,7 +306,7 @@ class gCalibrate(tk.Frame):
 
         self.reset_offsets = tk.Button(
             self.master.values_box,
-            text='Reset All',
+            text='Zero Offsets',
             command=self.clear,
             foreground=colors.background,
             background=colors.cool50,
@@ -390,11 +389,10 @@ class gCalibrate(tk.Frame):
 
     def write(self):
         try:
-            self.master.calibrations = {self.full_id1: self.s1_offset,
-            self.full_id2: self.s2_offset,
-            self.full_id3: self.s3_offset
+            self.master.calibrations = {self.full_id1: round(self.s1_offset, 1),
+            self.full_id2: round(self.s2_offset, 1),
+            self.full_id3: round(self.s3_offset, 1)
             }
-            logger.debug('write called %s', self.master.calibrations)
         except Exception as e:
             logger.exception('%s', e)
 
@@ -427,8 +425,6 @@ class gCalibrate(tk.Frame):
         self.reset_offsets.place(x=0, y=0, height=0, width=0)
         self.write_offsets.place(x=0, y=0, height=0, width=0)
 
-        # self.back_button.place(x=0, y=0, height=0, width=0)
-
     def show(self):
         self.sensor_map = self.xd.get(paths.sensor_map)
         self.sensors_raw = self.xd.get(paths.sensors_raw)
@@ -458,7 +454,5 @@ class gCalibrate(tk.Frame):
         self.s2_decrease.place(x=740, y=100, height=50, width=40)
         self.s3_decrease.place(x=740, y=160, height=50, width=40)
 
-        self.reset_offsets.place(x=200, y=230, height=50, width=200)
-        self.write_offsets.place(x=460, y=230, height=50, width=260)
-
-        # self.back_button.place(x=10, y=134, height=52, width=110)
+        self.reset_offsets.place(x=200, y=230, height=50, width=220)
+        self.write_offsets.place(x=480, y=230, height=50, width=240)

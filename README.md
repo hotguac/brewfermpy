@@ -6,6 +6,7 @@ This should, but hasn't been tested, to work with HDMI out on the rpi. I've deve
 
 It has the capability to control the temperature of the beer within 0.1F, although it would normally be tuned looser to save energy. The target temperature and the sensor assignments are maintained through the GUI. Presently the parameters for the two PID controllers (beer and chamber) are in the python code. The ability to adjust the PID parameters is the next development step.
 
+additional information at https://hotguac.github.io/brewfermpy/
 ```
 sudo apt install bluetooth libbluetooth-dev libglib2.0-dev
 sudo apt install libboost-dev libboost-thread-dev libboost-python-dev

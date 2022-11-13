@@ -53,12 +53,13 @@ class BrewfermController():
         self.chamberPID.pid._integral = 50
 
         self.last_output = datetime.now() - timedelta(minutes=3)
+        self.calibrations = self.xd.get(paths.calibrations, {})
 
     def calculate(self):
         try:
             beer_target = self.xd.get(paths.beer_target)
-            beer_temp = self.xd.get(paths.beer_temp)
-            chamber_temp = self.xd.get(paths.chamber_temp)
+            beer_temp = self.xd.get(paths.beer_temp) + self.xd.get(paths.beer_temp_offset, 0.0)
+            chamber_temp = self.xd.get(paths.chamber_temp) + self.xd.get(paths.chamber_temp_offset, 0.0)
 
             if beer_target != self.beerPID.pid.setpoint:
                 self.beerPID.change_target(beer_target)

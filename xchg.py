@@ -73,20 +73,31 @@ class XchgData():
                 paths.calibrations: lambda: self.get_gui('calibrations'),
                 paths.sensors_raw: lambda: self.get_sensors_raw(),
                 paths.blue_sg: lambda: self.get_blue(),
-                paths.blue_ts: lambda: self.get_blue_ts()
+                paths.blue_ts: lambda: self.get_blue_ts(),
+                paths.ambient_temp_offset: lambda: self.get_offset(field_name),
+                paths.beer_temp_offset: lambda: self.get_offset(field_name),
+                paths.chamber_temp_offset: lambda: self.get_offset(field_name)
             }
 
             result = switcher.get(field_name)  # returns a function object
             if result:
                 x = result()
-                if x:
-                    return result()  # execute the lambda expression function
-                else:
+                if x is None:
+                    logger.debug('xchg get defaulting field %s', field_name)
+                    logger.debug('lambda result = %s', result())
                     return default
+                else:
+                    return result()  # execute the lambda expression function
             else:
                 return default
         except Exception as e:
             logger.exception('%s %s', type(e), e)
+
+    def get_offset(self, field_name):
+        # TODO: retrieve offset
+        calibrations = self.get(paths.calibrations, {})
+        
+        return 0.0
 
     def get_blue(self):
         try:

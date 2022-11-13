@@ -18,9 +18,12 @@ current = 'current'
 desired = 'desired'
 
 ambient_temp = 'ambient_temp'
+ambient_temp_offset = 'ambient_offset'
 beer_temp = 'beer_temp'
+beer_temp_offset = 'beer_offset'
 beer_target = 'beer_target'
 chamber_temp = 'chamber_temp'
+chamber_temp_offset = 'chamber_offset'
 blue_sg = 'blue_sg'
 blue_ts = 'blue_ts'
 

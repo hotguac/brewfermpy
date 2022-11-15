@@ -95,9 +95,34 @@ class XchgData():
 
     def get_offset(self, field_name):
         # TODO: retrieve offset
+        found = False
+        result = 0.0
+
         calibrations = self.get(paths.calibrations, {})
+        map = self.get(paths.sensor_map, {})
+
+        if field_name == paths.beer_temp_offset:
+            role = 'beer'
+        else: 
+            if field_name == paths.chamber_temp_offset:
+                role = 'chamber'
+            else:
+                if field_name == paths.ambient_temp_offset:
+                    role = 'ambient'
+
+        for x in map:
+            if map[x] == role:
+                result = calibrations[x]
+                # logger.debug('found sensor_id=%s with role=%s and offset=%s', x, map[x], result)
+                found = True
+            
+        if found == False:
+            logger.debug(' ')
+            logger.debug('field= %s role= %s', field_name, role)                
+            logger.debug('calib=%s map=%s', calibrations, map)
+            logger.debug(' ')
         
-        return 0.0
+        return result
 
     def get_blue(self):
         try:

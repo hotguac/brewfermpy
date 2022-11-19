@@ -43,7 +43,7 @@ class gMiddle(tk.Frame):
 
         self.xd = XchgData(paths.gui_out)
 
-        self.beer_temp = self.xd.get(paths.beer_temp, 69.0)
+        self.beer_temp = self.xd.get(paths.beer_temp) + self.xd.get(paths.beer_temp_offset)
 
         # This will set the default if no gui_out.mmap exists !!!!
         self.beer_target = self.xd.get(paths.beer_target, 75.0)

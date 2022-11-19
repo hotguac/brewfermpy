@@ -95,9 +95,34 @@ class XchgData():
 
     def get_offset(self, field_name):
         # TODO: retrieve offset
+        found = False
+        result = 0.0
+
         calibrations = self.get(paths.calibrations, {})
-        
-        return 0.0
+        map = self.get(paths.sensor_map, {})
+
+        if field_name == paths.beer_temp_offset:
+            role = 'beer'
+        else:
+            if field_name == paths.chamber_temp_offset:
+                role = 'chamber'
+            else:
+                if field_name == paths.ambient_temp_offset:
+                    role = 'ambient'
+
+        for x in map:
+            if map[x] == role:
+                result = calibrations[x]
+                # logger.debug('found sensor_id=%s with role=%s and offset=%s', x, map[x], result)
+                found = True
+
+        if found is False:
+            logger.debug(' ')
+            logger.debug('field= %s role= %s', field_name, role)
+            logger.debug('calib=%s map=%s', calibrations, map)
+            logger.debug(' ')
+
+        return result
 
     def get_blue(self):
         try:
@@ -377,7 +402,7 @@ class Xchg():
 
         except Exception as e:
             logger.exception("mmap write %s %s", type(e), e)
-            raise(e)
+            raise e
 
 
 # module test runs if module invoked directly

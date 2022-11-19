@@ -40,7 +40,7 @@ class gTop(tk.Frame):
 
     def update_ambient(self):
         try:
-            at = self.xd.get(paths.ambient_temp)
+            at = self.xd.get(paths.ambient_temp) + self.xd.get(paths.ambient_temp_offset)
             x = str(round(at)) + 'F'
             self.ambient_temp['text'] = x
             self.ambient_temp.after(5000, self.update_ambient)

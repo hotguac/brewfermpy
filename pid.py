@@ -6,6 +6,7 @@ from simple_pid import PID
 
 # Import application libraries ------------------------------------------------
 from logger import BrewfermLogger
+import paths
 
 
 """
@@ -19,69 +20,58 @@ class BeerPID:
     def __init__(self, setpoint):
         self.sample_time = 60.0  # seconds
 
-        self.kp = 6.0  # these should get overwriten quickly
-        self.ki = 0.8
-        self.kd = 0.01
+        # these are defaults that will be
+        # overwritten by any user stored values
+        self.kp = paths.default_beerP
+        self.ki = paths.default_beerI
+        self.kd = paths.default_beerD
 
         self.setpoint = setpoint
-
-        low_limit = setpoint - 20
-        if low_limit < 34:
-            low_limit = 34
-
-        high_limit = setpoint + 4
-        if high_limit > 94:
-            high_limit = 94
 
         self.pid = PID(
             Kp=self.kp,
             Ki=self.ki,
             Kd=self.kd,
             sample_time=2,
-            output_limits=(low_limit, high_limit),
+            output_limits=self.calculate_limits(setpoint),
             setpoint=self.setpoint)
-
-    def update(self, current_temp):
-        # TODO: refactor the limits from here, init, and change_target
-        if (current_temp - self.setpoint) > 2:
-            low_limit = self.setpoint - 20
-            if low_limit < 34:
-                low_limit = 34
-        else:
-            old_low = self.pid.output_limits[0]
-            low_limit = ((self.setpoint - 8) + (old_low * 89)) / 90
-
-            if low_limit < 34:
-                low_limit = 34
-
-        high_limit = self.pid.output_limits[1]
-        self.pid.output_limits = low_limit, high_limit
-
-        # logger.info('current = %s limits = %s', current_temp, self.pid.output_limits)
-        return self.pid(current_temp)
-
-    def change_target(self, setpoint):
-        # TODO: the low limit is wrong!! get from controller
-        low_limit = setpoint - 6
-        if low_limit < 34:
-            low_limit = 34
-
-        high_limit = setpoint + 4
-        if high_limit > 84:
-            high_limit = 84
-
-        if setpoint != self.setpoint:
-            self.setpoint = setpoint
-            self.pid.output_limits = low_limit, high_limit
-            self.pid.setpoint = self.setpoint
-            self.pid._integral = setpoint
-            self.pid._last_output = setpoint
 
         logger.info(
             'new beer target %s with limits %s',
             self.pid.setpoint,
-            self.pid.output_limits
-            )
+            self.pid.output_limits)
+
+    def calculate_limits(self, current_temp):
+        if current_temp > (self.setpoint + 2):
+            low_limit = self.setpoint - paths.beer_lowlimit_offset
+        else:
+            low_limit = self.setpoint - (paths.beer_lowlimit_offset * 0.6)
+
+        if current_temp < (self.setpoint - 2):
+            high_limit = self.setpoint + paths.beer_highlimit_offset
+        else:
+            high_limit = self.setpoint + (paths.beer_highlimit_offset * 0.6)
+
+        if low_limit < paths.beer_lowlimit_low:
+            low_limit = paths.beer_lowlimit_low
+
+        if high_limit > paths.beer_highlimit_high:
+            high_limit = paths.beer_highlimit_high
+
+        return low_limit, high_limit
+
+    def update(self, current_temp):
+        self.pid.output_limits = self.calculate_limits(current_temp)
+
+        return self.pid(current_temp)
+
+    def change_target(self, setpoint):
+        if setpoint != self.setpoint:
+            self.setpoint = setpoint
+            self.pid.output_limits = self.calculate_limits(setpoint)
+            self.pid.setpoint = self.setpoint
+            self.pid._integral = setpoint
+            self.pid._last_output = setpoint
 
     def get_tuning(self):
         try:
@@ -115,9 +105,11 @@ class BeerPID:
 
 class ChamberPID:
     def __init__(self, setpoint):
-        self.kp = 2.0
-        self.ki = 0.01
-        self.kd = 0.000001
+        # these are defaults that will be
+        # overwritten by any user stored values
+        self.kp = paths.default_chamberP
+        self.ki = paths.default_chamberI
+        self.kd = paths.default_chamberD
 
         self.setpoint = setpoint
         self.pid = PID(

@@ -31,9 +31,9 @@ app = Flask(__name__)
 
 @app.route('/values')
 def values():
-    current = xd.get(paths.beer_temp)
+    current = xd.get(paths.beer_temp) + xd.get(paths.beer_temp_offset)
     target = xd.get(paths.beer_target)
-    chamber = xd.get(paths.chamber_temp)
+    chamber = xd.get(paths.chamber_temp) + xd.get(paths.beer_temp_offset)
     sg = xd.get(paths.blue_sg)
 
     try:
@@ -60,9 +60,9 @@ def values():
 
 @app.route('/')
 def index():
-    current = xd.get(paths.beer_temp)
+    current = xd.get(paths.beer_temp) + xd.get(paths.beer_temp_offset)
     target = xd.get(paths.beer_target)
-    chamber = xd.get(paths.chamber_temp)
+    chamber = xd.get(paths.chamber_temp) + xd.get(paths.chamber_temp_offset)
     sg = xd.get(paths.blue_sg)
 
     templateData = {

@@ -14,7 +14,7 @@ class BrewfermLogger:
 
         # loggers are a singleton, don't reconfigure if already created
         if not len(self.logger.handlers):
-            
+
             self.logger.setLevel(logging.DEBUG)
 
             if module == 'webs.py':

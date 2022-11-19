@@ -105,7 +105,7 @@ class BrewfermController():
             logger.exception("%s %s", type(e), e)
 
     def update(self):
-        beer_temp = self.xd.get(paths.beer_temp)
+        beer_temp = self.xd.get(paths.beer_temp) + self.xd.get(paths.beer_temp_offset, 0.0)
         beer_target = self.xd.get(paths.beer_target)
 
         if (self.xd.get(paths.state, paths.paused) == paths.paused):

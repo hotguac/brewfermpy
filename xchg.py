@@ -103,7 +103,7 @@ class XchgData():
 
         if field_name == paths.beer_temp_offset:
             role = 'beer'
-        else: 
+        else:
             if field_name == paths.chamber_temp_offset:
                 role = 'chamber'
             else:
@@ -115,13 +115,13 @@ class XchgData():
                 result = calibrations[x]
                 # logger.debug('found sensor_id=%s with role=%s and offset=%s', x, map[x], result)
                 found = True
-            
-        if found == False:
+
+        if found is False:
             logger.debug(' ')
-            logger.debug('field= %s role= %s', field_name, role)                
+            logger.debug('field= %s role= %s', field_name, role)
             logger.debug('calib=%s map=%s', calibrations, map)
             logger.debug(' ')
-        
+
         return result
 
     def get_blue(self):
@@ -402,7 +402,7 @@ class Xchg():
 
         except Exception as e:
             logger.exception("mmap write %s %s", type(e), e)
-            raise(e)
+            raise e
 
 
 # module test runs if module invoked directly

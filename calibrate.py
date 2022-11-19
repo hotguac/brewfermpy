@@ -92,7 +92,7 @@ class gCalibrate(tk.Frame):
                             self.full_id3 = x
                             self.sensor3['text'] = str(x)[-4:]
                             self.reported3['text'] = str(round(self.sensors_raw[id][x], 1))
-    
+
             self.extract_offsets()
             self.update_temps()
         except Exception as e:
@@ -102,76 +102,76 @@ class gCalibrate(tk.Frame):
         normal_font = font.Font(family='DejaVu Sans Mono', size=-36)  # , weight='bold')
 
         self.sensor1 = tk.Label(self.master.values_box,
-                            text='',
-                            background=colors.background,
-                            fg=colors.normal50,
-                            anchor='w',
-                            font=normal_font
-                            )
+                                text='',
+                                background=colors.background,
+                                fg=colors.normal50,
+                                anchor='w',
+                                font=normal_font
+                                )
 
         self.sensor2 = tk.Label(self.master.values_box,
-                            text='',
-                            background=colors.background,
-                            fg=colors.normal50,
-                            anchor='w',
-                            font=normal_font
-                            )
+                                text='',
+                                background=colors.background,
+                                fg=colors.normal50,
+                                anchor='w',
+                                font=normal_font
+                                )
 
         self.sensor3 = tk.Label(self.master.values_box,
-                            text='',
-                            background=colors.background,
-                            fg=colors.normal50,
-                            anchor='w',
-                            font=normal_font
-                            )
+                                text='',
+                                background=colors.background,
+                                fg=colors.normal50,
+                                anchor='w',
+                                font=normal_font
+                                )
 
         self.reported1 = tk.Label(self.master.values_box,
-                              text="61",
-                              background=colors.background,
-                              fg=colors.normal50,
-                              anchor='w',
-                              font=normal_font
-                              )
+                                  text="61",
+                                  background=colors.background,
+                                  fg=colors.normal50,
+                                  anchor='w',
+                                  font=normal_font
+                                  )
 
         self.reported2 = tk.Label(self.master.values_box,
-                              text="62",
-                              background=colors.background,
-                              fg=colors.normal50,
-                              anchor='w',
-                              font=normal_font
-                              )
+                                  text="62",
+                                  background=colors.background,
+                                  fg=colors.normal50,
+                                  anchor='w',
+                                  font=normal_font
+                                  )
 
         self.reported3 = tk.Label(self.master.values_box,
-                              text='',
-                              background=colors.background,
-                              fg=colors.normal50,
-                              anchor='w',
-                              font=normal_font
-                              )
+                                  text='',
+                                  background=colors.background,
+                                  fg=colors.normal50,
+                                  anchor='w',
+                                  font=normal_font
+                                  )
 
         self.actual1 = tk.Label(self.master.values_box,
-                               text="??.?",
-                               background=colors.background,
-                               fg=colors.normal50,
-                               anchor='w',
-                               font=normal_font
-                               )
+                                text="??.?",
+                                background=colors.background,
+                                fg=colors.normal50,
+                                anchor='w',
+                                font=normal_font
+                                )
 
         self.actual2 = tk.Label(self.master.values_box,
-                               text="??.?",
-                               background=colors.background,
-                               fg=colors.normal50,
-                               anchor='w',
-                               font=normal_font
-                               )
+                                text="??.?",
+                                background=colors.background,
+                                fg=colors.normal50,
+                                anchor='w',
+                                font=normal_font
+                                )
 
         self.actual3 = tk.Label(self.master.values_box,
-                               text='??.?',
-                               background=colors.background,
-                               fg=colors.normal50,
-                               anchor='w',
-                               font=normal_font
-                               )
+                                text='??.?',
+                                background=colors.background,
+                                fg=colors.normal50,
+                                anchor='w',
+                                font=normal_font
+                                )
 
         self.button_font = font.Font(family="Arial", size=-32, weight="bold")
 
@@ -211,7 +211,7 @@ class gCalibrate(tk.Frame):
         self.s1_increase = tk.Button(
             self.master.values_box,
             text='+',
-            command= lambda slot=1: self.increase(slot),
+            command=lambda slot=1: self.increase(slot),
             foreground=colors.background,
             background=colors.normal50,
             borderwidth=0,
@@ -227,7 +227,7 @@ class gCalibrate(tk.Frame):
         self.s1_decrease = tk.Button(
             self.master.values_box,
             text='-',
-            command= lambda slot=1: self.decrease(slot),
+            command=lambda slot=1: self.decrease(slot),
             foreground=colors.background,
             background=colors.normal50,
             borderwidth=0,
@@ -243,7 +243,7 @@ class gCalibrate(tk.Frame):
         self.s2_increase = tk.Button(
             self.master.values_box,
             text='+',
-            command= lambda slot=2: self.increase(slot),
+            command=lambda slot=2: self.increase(slot),
             foreground=colors.background,
             background=colors.normal50,
             borderwidth=0,
@@ -259,7 +259,7 @@ class gCalibrate(tk.Frame):
         self.s2_decrease = tk.Button(
             self.master.values_box,
             text='-',
-            command= lambda slot=2: self.decrease(slot),
+            command=lambda slot=2: self.decrease(slot),
             foreground=colors.background,
             background=colors.normal50,
             borderwidth=0,
@@ -275,7 +275,7 @@ class gCalibrate(tk.Frame):
         self.s3_increase = tk.Button(
             self.master.values_box,
             text='+',
-            command= lambda slot=3: self.increase(slot),
+            command=lambda slot=3: self.increase(slot),
             foreground=colors.background,
             background=colors.normal50,
             borderwidth=0,
@@ -291,7 +291,7 @@ class gCalibrate(tk.Frame):
         self.s3_decrease = tk.Button(
             self.master.values_box,
             text='-',
-            command= lambda slot=3: self.decrease(slot),
+            command=lambda slot=3: self.decrease(slot),
             foreground=colors.background,
             background=colors.normal50,
             borderwidth=0,
@@ -352,10 +352,9 @@ class gCalibrate(tk.Frame):
                         x = self.sensors_raw[role][id] + self.s3_offset
                         self.actual3['text'] = round(x, 1)
 
-            self.actual1.after(1000*10, self.update_temps)
+            self.actual1.after(1000, self.update_temps)
         except Exception as e:
             logger.exception("%s %s", type(e), e)
-
 
     def increase(self, slot):
         try:
@@ -390,9 +389,9 @@ class gCalibrate(tk.Frame):
     def write(self):
         try:
             self.master.calibrations = {self.full_id1: round(self.s1_offset, 1),
-            self.full_id2: round(self.s2_offset, 1),
-            self.full_id3: round(self.s3_offset, 1)
-            }
+                                        self.full_id2: round(self.s2_offset, 1),
+                                        self.full_id3: round(self.s3_offset, 1)
+                                        }
         except Exception as e:
             logger.exception('%s', e)
 

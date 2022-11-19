@@ -6,3 +6,4 @@ webserver/__pycache__/*
 webserver/*.pem
 *.mmap
 todo.txt
+.vscode/settings.json

@@ -41,7 +41,7 @@ class BrewfermRelays:
 
         self.off_on = 6  # minutes
         self.max_on = 12  # minutes
-        self.min_on = 0.5 # 1  # minutes
+        self.min_on = 0.5  # 1  # minutes
 
         self.hc_balance = 8  # multiply times for heat
 

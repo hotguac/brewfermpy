@@ -53,9 +53,15 @@ desired_ts = 'desired_ts'
 sensors_raw = 'sensors_raw'
 
 default_beerP = 8.0
-default_beerI = 0.003 # 0.0015
+default_beerI = 0.003  # 0.0015
 default_beerD = 0
 
 default_chamberP = 6.0
 default_chamberI = 0.004
 default_chamberD = 0
+
+beer_lowlimit_offset = 20
+beer_lowlimit_low = 34
+
+beer_highlimit_offset = 6
+beer_highlimit_high = 94

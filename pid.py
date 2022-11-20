@@ -42,15 +42,8 @@ class BeerPID:
             self.pid.output_limits)
 
     def calculate_limits(self, current_temp):
-        if current_temp > (self.setpoint + 2):
-            low_limit = self.setpoint - paths.beer_lowlimit_offset
-        else:
-            low_limit = self.setpoint - (paths.beer_lowlimit_offset * 0.6)
-
-        if current_temp < (self.setpoint - 2):
-            high_limit = self.setpoint + paths.beer_highlimit_offset
-        else:
-            high_limit = self.setpoint + (paths.beer_highlimit_offset * 0.6)
+        low_limit = self.setpoint - paths.beer_lowlimit_offset
+        high_limit = self.setpoint + paths.beer_highlimit_offset
 
         if low_limit < paths.beer_lowlimit_low:
             low_limit = paths.beer_lowlimit_low

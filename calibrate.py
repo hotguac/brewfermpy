@@ -31,19 +31,16 @@ class gCalibrate(tk.Frame):
         self.create_widgets()
 
         self.xd = XchgData()  # read only for now
-        self.sensor_map = None
-        self.sensors_raw = None
-        self.calibrations = None
-
-        self.full_id1 = ''
-        self.full_id1 = ''
-        self.full_id1 = ''
-
-        self.s1_offset = 0
-        self.s2_offset = 0
-        self.s3_offset = 0
-
+        self.sensors_raw = self.xd.get(paths.sensors_raw)
         self.calibrations = self.xd.get(paths.calibrations, {})
+
+        # self.full_id1 = ''
+        # self.full_id1 = ''
+        # self.full_id1 = ''
+
+        # self.s1_offset = 0
+        # self.s2_offset = 0
+        # self.s3_offset = 0
 
     def extract_offsets(self):
         try:
@@ -338,8 +335,6 @@ class gCalibrate(tk.Frame):
 
     def update_temps(self):
         try:
-            self.sensors_raw = self.xd.get(paths.sensors_raw)
-
             for role in self.sensors_raw:
                 for id in self.sensors_raw[role]:
                     if id == self.full_id1:
@@ -388,10 +383,12 @@ class gCalibrate(tk.Frame):
 
     def write(self):
         try:
-            self.master.calibrations = {self.full_id1: round(self.s1_offset, 1),
-                                        self.full_id2: round(self.s2_offset, 1),
-                                        self.full_id3: round(self.s3_offset, 1)
-                                        }
+            self.master.calibrations = self.calibrations
+
+            # self.master.calibrations = {self.full_id1: round(self.s1_offset, 1),
+            #                            self.full_id2: round(self.s2_offset, 1),
+            #                            self.full_id3: round(self.s3_offset, 1)
+            #                            }
         except Exception as e:
             logger.exception('%s', e)
 
@@ -425,8 +422,8 @@ class gCalibrate(tk.Frame):
         self.write_offsets.place(x=0, y=0, height=0, width=0)
 
     def show(self):
-        self.sensor_map = self.xd.get(paths.sensor_map)
-        self.sensors_raw = self.xd.get(paths.sensors_raw)
+        # self.sensor_map = self.xd.get(paths.sensor_map)
+        # self.sensors_raw = self.xd.get(paths.sensors_raw)
         self.populate_widgets()
 
         self.sensor1.place(x=140, y=30, height=80, width=100)

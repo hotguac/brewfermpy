@@ -114,10 +114,15 @@ class gBeerTemps(tk.Frame):
         try:
             self.after(500, self.update_temps)
 
-            beer_temp = self.xd.get(paths.beer_temp) + self.xd.get(paths.beer_temp_offset)
-            if beer_temp is None:
+            temp = self.xd.get(paths.beer_temp)
+            if temp is None:
                 self.current['text'] = '??'
             else:
+                offset = self.xd.get(paths.beer_temp_offset)
+                if offset is None:
+                    offset = 0.0
+
+                beer_temp = temp + offset
                 self.current['text'] = str(round(beer_temp))
 
             beer_target = self.xd.get(paths.beer_target)

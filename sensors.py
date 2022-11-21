@@ -29,32 +29,10 @@ class BrewfermSensors:
     def sleep_for(self):
         return self.sleep_time
 
-    def update_mapping(self):
-        try:
-            self.id_map = self.xd.get(paths.sensor_map, {})
-        except Exception as e:
-            logger.exception('update_mapping %s %s', type(e), e)
-
-    def map_sensors(self, readings):
-        result = {}
-        count = 0
-        try:
-            for id in readings.keys():
-                if id in self.id_map:
-                    result[self.id_map[id]] = {id: readings[id]}
-                else:
-                    logger.debug('not found id = %s', id)
-                    count += 1
-                    result['unknown_' + str(count)] = {id: readings[id]}
-        except Exception as e:
-            logger.exception('map_sensors %s %s', type(e), e)
-
-        return result
-
     def write_temps(self):
         self.scan_sensors()
         if self.current_reading:
-            self.xd.write_sensors(self.map_sensors(self.current_reading))
+            self.xd.write_sensors(self.current_reading)
             if not self.read_good:
                 logger.info('sensors read')
                 self.read_good = True
@@ -119,7 +97,7 @@ if __name__ == '__main__':
 
         killer = killer.GracefulKiller()
         while not killer.kill_now:
-            mysensors.update_mapping()
+            # mysensors.update_mapping()
             mysensors.write_temps()
             sleep(mysensors.sleep_for())
 

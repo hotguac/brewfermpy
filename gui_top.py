@@ -40,9 +40,14 @@ class gTop(tk.Frame):
 
     def update_ambient(self):
         try:
-            at = self.xd.get(paths.ambient_temp) + self.xd.get(paths.ambient_temp_offset)
-            x = str(round(at)) + 'F'
-            self.ambient_temp['text'] = x
+            ambient_temp = self.xd.get(paths.ambient_temp)
+            offset = self.xd.get(paths.ambient_temp_offset)
+            if ambient_temp is None or offset is None:
+                self.ambient_temp['text'] = ''
+            else:
+                at = ambient_temp + offset
+                x = str(round(at)) + 'F'
+                self.ambient_temp['text'] = x
             self.ambient_temp.after(5000, self.update_ambient)
         except Exception as e:
             logger.exception("%s %s", type(e), e)

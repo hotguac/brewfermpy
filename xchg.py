@@ -60,20 +60,26 @@ class XchgData():
             switcher = {
                 paths.current: lambda: self.get_relays(field_name),
                 paths.relays_ts: lambda: self.get_relays('ts'),
+
                 paths.desired: lambda: self.get_controller(field_name),
                 paths.desired_ts: lambda: self.get_controller('ts'),
+
                 paths.chamber_temp: lambda: self.get_temp('chamber'),
                 paths.beer_temp: lambda: self.get_temp('beer'),
                 paths.ambient_temp: lambda: self.get_temp('ambient'),
+
                 paths.beer_target: lambda: self.get_gui('beer_target'),
                 paths.beerPID: lambda: self.get_gui('beer_pid'),
                 paths.chamberPID: lambda: self.get_gui('chamber_pid'),
                 paths.state: lambda: self.get_gui('state'),
                 paths.sensor_map: lambda: self.get_gui('id_map'),
                 paths.calibrations: lambda: self.get_gui('calibrations'),
+
                 paths.sensors_raw: lambda: self.get_sensors_raw(),
+
                 paths.blue_sg: lambda: self.get_blue(),
                 paths.blue_ts: lambda: self.get_blue_ts(),
+
                 paths.ambient_temp_offset: lambda: self.get_offset(field_name),
                 paths.beer_temp_offset: lambda: self.get_offset(field_name),
                 paths.chamber_temp_offset: lambda: self.get_offset(field_name)
@@ -83,8 +89,8 @@ class XchgData():
             if result:
                 x = result()
                 if x is None:
-                    logger.debug('xchg get defaulting field %s', field_name)
-                    logger.debug('lambda result = %s', result())
+                    # logger.debug('xchg get defaulting field %s', field_name)
+                    # logger.debug('lambda result = %s', result())
                     return default
                 else:
                     return result()  # execute the lambda expression function
@@ -94,8 +100,6 @@ class XchgData():
             logger.exception('%s %s', type(e), e)
 
     def get_offset(self, field_name):
-        # TODO: retrieve offset
-        found = False
         result = 0.0
 
         calibrations = self.get(paths.calibrations, {})
@@ -113,14 +117,6 @@ class XchgData():
         for x in map:
             if map[x] == role:
                 result = calibrations[x]
-                # logger.debug('found sensor_id=%s with role=%s and offset=%s', x, map[x], result)
-                found = True
-
-        if found is False:
-            logger.debug(' ')
-            logger.debug('field= %s role= %s', field_name, role)
-            logger.debug('calib=%s map=%s', calibrations, map)
-            logger.debug(' ')
 
         return result
 
@@ -203,16 +199,19 @@ class XchgData():
 
         return result
 
-    def get_temp(self, field_name):
+    def get_temp(self, usage):
         result = None
         try:
-            x = self.get_sensors(field_name)
+            id_map = self.get_gui('id_map')
+            readings = self.get_sensors_raw()
 
-            if x:
-                for ct in x.keys():
-                    result = float(x[ct])
-        except Exception as e:
-            logger.exception('%s %s', type(e), e)
+            for sensor in id_map.keys():
+                if id_map[sensor] == usage:
+                    # logger.debug('id_map=%s sensor=%s readings=%s', id_map, sensor, readings)
+                    result = readings[sensor]
+        except Exception:  # as e:
+            logger.debug('sensor=%s readings=%s', sensor, readings)
+            # logger.exception('%s %s', type(e), e)
             return None
         else:
             return result

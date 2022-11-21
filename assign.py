@@ -31,40 +31,39 @@ class gAssign(tk.Frame):
         self.create_widgets()
 
         self.xd = XchgData()  # read only for now
-        self.sensor_map = None
-        self.sensors_raw = None
 
     def populate_widgets(self):
+        self.sensor_map = self.xd.get(paths.sensor_map)
+        self.sensors_raw = self.xd.get(paths.sensors_raw)
+
         slot = 0
         try:
             for id in self.sensors_raw:
                 if id == 'ts':
                     continue
 
-                if 'unknown' in id:
-                    current_usage = 'spare'
+                if id in self.sensor_map:
+                    current_usage = self.sensor_map[id]
                 else:
-                    current_usage = id
+                    current_usage = 'spare'
 
-                if id != 'ts':
-                    slot = slot + 1
-                    if slot == 1:
-                        self.func1['text'] = current_usage
-                        for x in self.sensors_raw[id]:
-                            self.id1['text'] = x
-                            self.temp1['text'] = str(round(self.sensors_raw[id][x]))
+                temperature = str(round(self.sensors_raw[id]))
 
-                    if slot == 2:
-                        self.func2['text'] = current_usage
-                        for x in self.sensors_raw[id]:
-                            self.id2['text'] = x
-                            self.temp2['text'] = str(round(self.sensors_raw[id][x]))
+                slot = slot + 1
+                if slot == 1:
+                    self.func1['text'] = current_usage
+                    self.id1['text'] = id
+                    self.temp1['text'] = temperature
 
-                    if slot == 3:
-                        self.func3['text'] = current_usage
-                        for x in self.sensors_raw[id]:
-                            self.id3['text'] = x
-                            self.temp3['text'] = str(round(self.sensors_raw[id][x]))
+                if slot == 2:
+                    self.func2['text'] = current_usage
+                    self.id2['text'] = id
+                    self.temp2['text'] = temperature
+
+                if slot == 3:
+                    self.func3['text'] = current_usage
+                    self.id3['text'] = id
+                    self.temp3['text'] = temperature
         except Exception as e:
             logger.exception('%s', e)
 
@@ -225,11 +224,11 @@ class gAssign(tk.Frame):
     def use_new_map(self):
         try:
             new_map = {}
-            if (self.func1['text'] != 'spare') and (self.id1['text'] != ''):
+            if (self.id1['text'] != ''):
                 new_map[self.id1['text']] = self.func1['text']
-            if (self.func2['text'] != 'spare') and (self.id2['text'] != ''):
+            if (self.id2['text'] != ''):
                 new_map[self.id2['text']] = self.func2['text']
-            if (self.func3['text'] != 'spare') and (self.id3['text'] != ''):
+            if (self.id3['text'] != ''):
                 new_map[self.id3['text']] = self.func3['text']
 
             self.master.id_map = new_map
@@ -281,8 +280,6 @@ class gAssign(tk.Frame):
         self.temp3.place(x=0, y=0, height=0, width=0)
 
     def show(self):
-        self.sensor_map = self.xd.get(paths.sensor_map)
-        self.sensors_raw = self.xd.get(paths.sensors_raw)
         self.populate_widgets()
 
         self.id1.place(x=140, y=60, height=80, width=340)

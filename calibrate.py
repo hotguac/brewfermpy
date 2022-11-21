@@ -31,67 +31,58 @@ class gCalibrate(tk.Frame):
         self.create_widgets()
 
         self.xd = XchgData()  # read only for now
-        self.sensors_raw = self.xd.get(paths.sensors_raw)
         self.calibrations = self.xd.get(paths.calibrations, {})
+        self.sensor_map = self.xd.get(paths.sensor_map)
 
-        # self.full_id1 = ''
-        # self.full_id1 = ''
-        # self.full_id1 = ''
-
-        # self.s1_offset = 0
-        # self.s2_offset = 0
-        # self.s3_offset = 0
-
-    def extract_offsets(self):
-        try:
-            for id in self.calibrations:
-                if id == self.full_id1:
-                    self.s1_offset = self.calibrations[id]
-                if id == self.full_id2:
-                    self.s2_offset = self.calibrations[id]
-                if id == self.full_id3:
-                    self.s3_offset = self.calibrations[id]
-        except Exception as e:
-            logger.exception("%s %s", type(e), e)
+        self.full_ids = []
 
     def populate_widgets(self):
+        self.sensors_raw = self.xd.get(paths.sensors_raw)
 
         slot = 0
         try:
             for id in self.sensors_raw:
-                if id == 'ts':
+                if str(id) == 'ts':
                     continue
 
-                if 'unknown' in id:
-                    current_usage = 'spare'
+                self.full_ids.append(id)
+
+                if id in self.sensor_map:
+                    sensor_usage = self.sensor_map[id]
                 else:
-                    current_usage = id
+                    sensor_usage = 'spare'
 
-                if id != 'ts':
-                    slot = slot + 1
-                    if slot == 1:
-                        self.role1['text'] = current_usage
-                        for x in self.sensors_raw[id]:
-                            self.full_id1 = x
-                            self.sensor1['text'] = str(x)[-4:]
-                            self.reported1['text'] = str(round(self.sensors_raw[id][x], 1))
+                # TODO: set the offset
+                offset = 0.0
+                if sensor_usage == 'beer':
+                    offset = self.xd.get(paths.beer_temp_offset)
+                if sensor_usage == 'chamber':
+                    offset = self.xd.get(paths.chamber_temp_offset)
+                if sensor_usage == 'ambient':
+                    offset = self.xd.get(paths.ambient_temp_offset)
 
-                    if slot == 2:
-                        self.role2['text'] = current_usage
-                        for x in self.sensors_raw[id]:
-                            self.full_id2 = x
-                            self.sensor2['text'] = str(x)[-4:]
-                            self.reported2['text'] = str(round(self.sensors_raw[id][x], 1))
+                temperature = str(round(self.sensors_raw[id], 1))
+                actual = str(round(self.sensors_raw[id] + offset, 1))
 
-                    if slot == 3:
-                        self.role3['text'] = current_usage
-                        for x in self.sensors_raw[id]:
-                            self.full_id3 = x
-                            self.sensor3['text'] = str(x)[-4:]
-                            self.reported3['text'] = str(round(self.sensors_raw[id][x], 1))
+                slot = slot + 1
+                if slot == 1:
+                    self.role1['text'] = sensor_usage
+                    self.sensor1['text'] = str(id)[-4:]
+                    self.reported1['text'] = temperature
+                    self.actual1['text'] = actual
 
-            self.extract_offsets()
-            self.update_temps()
+                if slot == 2:
+                    self.role2['text'] = sensor_usage
+                    self.sensor2['text'] = str(id)[-4:]
+                    self.reported2['text'] = temperature
+                    self.actual2['text'] = actual
+
+                if slot == 3:
+                    self.role3['text'] = sensor_usage
+                    self.sensor3['text'] = str(id)[-4:]
+                    self.reported3['text'] = temperature
+                    self.actual3['text'] = actual
+
         except Exception as e:
             logger.exception('%s', e)
 
@@ -333,62 +324,43 @@ class gCalibrate(tk.Frame):
             relief=tk.FLAT
             )
 
-    def update_temps(self):
-        try:
-            for role in self.sensors_raw:
-                for id in self.sensors_raw[role]:
-                    if id == self.full_id1:
-                        x = self.sensors_raw[role][id] + self.s1_offset
-                        self.actual1['text'] = round(x, 1)
-                    if id == self.full_id2:
-                        x = self.sensors_raw[role][id] + self.s2_offset
-                        self.actual2['text'] = round(x, 1)
-                    if id == self.full_id3:
-                        x = self.sensors_raw[role][id] + self.s3_offset
-                        self.actual3['text'] = round(x, 1)
-
-            self.actual1.after(1000, self.update_temps)
-        except Exception as e:
-            logger.exception("%s %s", type(e), e)
-
     def increase(self, slot):
         try:
-            if slot == 1:
-                self.s1_offset += 0.1
-            if slot == 2:
-                self.s2_offset += 0.1
-            if slot == 3:
-                self.s3_offset += 0.1
+            id = self.full_ids[slot-1]
+            if id in self.calibrations:
+                offset = self.calibrations[id]
+            else:
+                offset = 0.0
+
+            offset += 0.1
+
+            self.calibrations[id] = offset
         except Exception as e:
             logger.exception('%s', e)
 
     def decrease(self, slot):
         try:
-            if slot == 1:
-                self.s1_offset -= 0.1
-            if slot == 2:
-                self.s2_offset -= 0.1
-            if slot == 3:
-                self.s3_offset -= 0.1
+            id = self.full_ids[slot-1]
+            if id in self.calibrations:
+                offset = self.calibrations[id]
+            else:
+                offset = 0.0
+
+            offset -= 0.1
+
+            self.calibrations[id] = round(offset, 1)
         except Exception as e:
             logger.exception('%s', e)
 
     def clear(self):
         try:
-            self.s1_offset = 0.0
-            self.s2_offset = 0.0
-            self.s3_offset = 0.0
+            self.calibrations = {}
         except Exception as e:
             logger.exception('%s', e)
 
     def write(self):
         try:
             self.master.calibrations = self.calibrations
-
-            # self.master.calibrations = {self.full_id1: round(self.s1_offset, 1),
-            #                            self.full_id2: round(self.s2_offset, 1),
-            #                            self.full_id3: round(self.s3_offset, 1)
-            #                            }
         except Exception as e:
             logger.exception('%s', e)
 
@@ -422,8 +394,6 @@ class gCalibrate(tk.Frame):
         self.write_offsets.place(x=0, y=0, height=0, width=0)
 
     def show(self):
-        # self.sensor_map = self.xd.get(paths.sensor_map)
-        # self.sensors_raw = self.xd.get(paths.sensors_raw)
         self.populate_widgets()
 
         self.sensor1.place(x=140, y=30, height=80, width=100)

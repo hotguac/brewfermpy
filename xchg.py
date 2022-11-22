@@ -116,7 +116,10 @@ class XchgData():
 
         for x in map:
             if map[x] == role:
-                result = calibrations[x]
+                if x in calibrations:
+                    result = calibrations[x]
+                else:
+                    result = 0.0
 
         return result
 

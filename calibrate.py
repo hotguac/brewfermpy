@@ -52,14 +52,10 @@ class gCalibrate(tk.Frame):
                 else:
                     sensor_usage = 'spare'
 
-                # TODO: set the offset
-                offset = 0.0
-                if sensor_usage == 'beer':
-                    offset = self.xd.get(paths.beer_temp_offset)
-                if sensor_usage == 'chamber':
-                    offset = self.xd.get(paths.chamber_temp_offset)
-                if sensor_usage == 'ambient':
-                    offset = self.xd.get(paths.ambient_temp_offset)
+                if id in self.calibrations:
+                    offset = self.calibrations[id]
+                else:
+                    offset = 0.0
 
                 temperature = str(round(self.sensors_raw[id], 1))
                 actual = str(round(self.sensors_raw[id] + offset, 1))
@@ -332,9 +328,10 @@ class gCalibrate(tk.Frame):
             else:
                 offset = 0.0
 
-            offset += 0.1
+            offset = round(offset + 0.1, 1)
 
             self.calibrations[id] = offset
+            self.populate_widgets()
         except Exception as e:
             logger.exception('%s', e)
 
@@ -346,15 +343,17 @@ class gCalibrate(tk.Frame):
             else:
                 offset = 0.0
 
-            offset -= 0.1
+            offset = round(offset - 0.1, 1)
 
             self.calibrations[id] = round(offset, 1)
+            self.populate_widgets()
         except Exception as e:
             logger.exception('%s', e)
 
     def clear(self):
         try:
             self.calibrations = {}
+            self.populate_widgets()
         except Exception as e:
             logger.exception('%s', e)
 

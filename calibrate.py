@@ -42,7 +42,7 @@ class gCalibrate(tk.Frame):
         slot = 0
         try:
             for id in self.sensors_raw:
-                if str(id) == 'ts':
+                if str(id) == 'ts' or slot == 3:
                     continue
 
                 self.full_ids.append(id)
@@ -60,269 +60,143 @@ class gCalibrate(tk.Frame):
                 temperature = str(round(self.sensors_raw[id], 1))
                 actual = str(round(self.sensors_raw[id] + offset, 1))
 
+                self.sensor_id_short[slot]['text'] = str(id)[-4:]
+                self.reported[slot]['text'] = temperature
+                self.actual[slot]['text'] = actual
+                self.role[slot]['text'] = sensor_usage
+
                 slot = slot + 1
-                if slot == 1:
-                    self.role1['text'] = sensor_usage
-                    self.sensor1['text'] = str(id)[-4:]
-                    self.reported1['text'] = temperature
-                    self.actual1['text'] = actual
-
-                if slot == 2:
-                    self.role2['text'] = sensor_usage
-                    self.sensor2['text'] = str(id)[-4:]
-                    self.reported2['text'] = temperature
-                    self.actual2['text'] = actual
-
-                if slot == 3:
-                    self.role3['text'] = sensor_usage
-                    self.sensor3['text'] = str(id)[-4:]
-                    self.reported3['text'] = temperature
-                    self.actual3['text'] = actual
-
         except Exception as e:
             logger.exception('%s', e)
 
     def create_widgets(self):
-        normal_font = font.Font(family='DejaVu Sans Mono', size=-36)  # , weight='bold')
+        try:
+            normal_font = font.Font(family='DejaVu Sans Mono', size=-36)  # , weight='bold')
+            self.button_font = font.Font(family="Arial", size=-32, weight="bold")
 
-        self.sensor1 = tk.Label(self.master.values_box,
-                                text='',
-                                background=colors.background,
-                                fg=colors.normal50,
-                                anchor='w',
-                                font=normal_font
-                                )
+            self.sensor_id_short = []
+            self.reported = []
+            self.actual = []
+            self.role = []
+            self.increase_btn = []
+            self.decrease_btn = []
 
-        self.sensor2 = tk.Label(self.master.values_box,
-                                text='',
-                                background=colors.background,
-                                fg=colors.normal50,
-                                anchor='w',
-                                font=normal_font
-                                )
+            for slot in range(3):
+                self.sensor_id_short.append(
+                    tk.Label(
+                        self.master.values_box,
+                        text='',
+                        background=colors.background,
+                        fg=colors.normal50,
+                        anchor='w',
+                        font=normal_font
+                        ))
 
-        self.sensor3 = tk.Label(self.master.values_box,
-                                text='',
-                                background=colors.background,
-                                fg=colors.normal50,
-                                anchor='w',
-                                font=normal_font
-                                )
+                self.reported.append(
+                    tk.Label(
+                        self.master.values_box,
+                        text="61",
+                        background=colors.background,
+                        fg=colors.normal50,
+                        anchor='w',
+                        font=normal_font
+                        ))
 
-        self.reported1 = tk.Label(self.master.values_box,
-                                  text="61",
-                                  background=colors.background,
-                                  fg=colors.normal50,
-                                  anchor='w',
-                                  font=normal_font
-                                  )
+                self.actual.append(
+                    tk.Label(
+                        self.master.values_box,
+                        text='??.?',
+                        background=colors.background,
+                        fg=colors.normal50,
+                        anchor='w',
+                        font=normal_font
+                        ))
 
-        self.reported2 = tk.Label(self.master.values_box,
-                                  text="62",
-                                  background=colors.background,
-                                  fg=colors.normal50,
-                                  anchor='w',
-                                  font=normal_font
-                                  )
+                self.role.append(
+                    tk.Label(
+                        self.master.values_box,
+                        text='spare',
+                        foreground=colors.background,
+                        background=colors.normal50,
+                        borderwidth=0,
+                        highlightthickness=0,
+                        font=self.button_font,
+                        anchor='w'
+                        ))
 
-        self.reported3 = tk.Label(self.master.values_box,
-                                  text='',
-                                  background=colors.background,
-                                  fg=colors.normal50,
-                                  anchor='w',
-                                  font=normal_font
-                                  )
+                self.increase_btn.append(
+                    tk.Button(
+                        self.master.values_box,
+                        text='+',
+                        foreground=colors.background,
+                        background=colors.normal50,
+                        borderwidth=0,
+                        highlightthickness=0,
+                        font=self.button_font,
+                        anchor='w',
+                        activebackground=colors.normal_button,
+                        highlightbackground=colors.normal_button,
+                        highlightcolor=colors.normal_button,
+                        relief=tk.FLAT
+                        ))
 
-        self.actual1 = tk.Label(self.master.values_box,
-                                text="??.?",
-                                background=colors.background,
-                                fg=colors.normal50,
-                                anchor='w',
-                                font=normal_font
-                                )
+                self.increase_btn[slot].config(command=lambda slot=slot: self.increase(slot))
 
-        self.actual2 = tk.Label(self.master.values_box,
-                                text="??.?",
-                                background=colors.background,
-                                fg=colors.normal50,
-                                anchor='w',
-                                font=normal_font
-                                )
+                self.decrease_btn.append(
+                        tk.Button(
+                            self.master.values_box,
+                            text='-',
+                            foreground=colors.background,
+                            background=colors.normal50,
+                            borderwidth=0,
+                            highlightthickness=0,
+                            font=self.button_font,
+                            anchor='w',
+                            activebackground=colors.normal_button,
+                            highlightbackground=colors.normal_button,
+                            highlightcolor=colors.normal_button,
+                            relief=tk.FLAT
+                            ))
 
-        self.actual3 = tk.Label(self.master.values_box,
-                                text='??.?',
-                                background=colors.background,
-                                fg=colors.normal50,
-                                anchor='w',
-                                font=normal_font
-                                )
+                self.decrease_btn[slot].config(command=lambda slot=slot: self.decrease(slot))
 
-        self.button_font = font.Font(family="Arial", size=-32, weight="bold")
+            self.reset_offsets = tk.Button(
+                self.master.values_box,
+                text='Zero Offsets',
+                command=self.clear,
+                foreground=colors.background,
+                background=colors.cool50,
+                borderwidth=0,
+                highlightthickness=0,
+                font=self.button_font,
+                anchor='w',
+                activebackground=colors.normal_button,
+                highlightbackground=colors.normal_button,
+                highlightcolor=colors.normal_button,
+                relief=tk.FLAT
+                )
 
-        self.role1 = tk.Label(
-            self.master.values_box,
-            text='spare',
-            foreground=colors.background,
-            background=colors.normal50,
-            borderwidth=0,
-            highlightthickness=0,
-            font=self.button_font,
-            anchor='w'
-            )
-
-        self.role2 = tk.Label(
-            self.master.values_box,
-            text='spare',
-            foreground=colors.background,
-            background=colors.normal50,
-            borderwidth=0,
-            highlightthickness=0,
-            font=self.button_font,
-            anchor='w'
-            )
-
-        self.role3 = tk.Label(
-            self.master.values_box,
-            text='spare',
-            foreground=colors.background,
-            background=colors.normal50,
-            borderwidth=0,
-            highlightthickness=0,
-            font=self.button_font,
-            anchor='w'
-            )
-
-        self.s1_increase = tk.Button(
-            self.master.values_box,
-            text='+',
-            command=lambda slot=1: self.increase(slot),
-            foreground=colors.background,
-            background=colors.normal50,
-            borderwidth=0,
-            highlightthickness=0,
-            font=self.button_font,
-            anchor='w',
-            activebackground=colors.normal_button,
-            highlightbackground=colors.normal_button,
-            highlightcolor=colors.normal_button,
-            relief=tk.FLAT
-            )
-
-        self.s1_decrease = tk.Button(
-            self.master.values_box,
-            text='-',
-            command=lambda slot=1: self.decrease(slot),
-            foreground=colors.background,
-            background=colors.normal50,
-            borderwidth=0,
-            highlightthickness=0,
-            font=self.button_font,
-            anchor='w',
-            activebackground=colors.normal_button,
-            highlightbackground=colors.normal_button,
-            highlightcolor=colors.normal_button,
-            relief=tk.FLAT
-            )
-
-        self.s2_increase = tk.Button(
-            self.master.values_box,
-            text='+',
-            command=lambda slot=2: self.increase(slot),
-            foreground=colors.background,
-            background=colors.normal50,
-            borderwidth=0,
-            highlightthickness=0,
-            font=self.button_font,
-            anchor='w',
-            activebackground=colors.normal_button,
-            highlightbackground=colors.normal_button,
-            highlightcolor=colors.normal_button,
-            relief=tk.FLAT
-            )
-
-        self.s2_decrease = tk.Button(
-            self.master.values_box,
-            text='-',
-            command=lambda slot=2: self.decrease(slot),
-            foreground=colors.background,
-            background=colors.normal50,
-            borderwidth=0,
-            highlightthickness=0,
-            font=self.button_font,
-            anchor='w',
-            activebackground=colors.normal_button,
-            highlightbackground=colors.normal_button,
-            highlightcolor=colors.normal_button,
-            relief=tk.FLAT
-            )
-
-        self.s3_increase = tk.Button(
-            self.master.values_box,
-            text='+',
-            command=lambda slot=3: self.increase(slot),
-            foreground=colors.background,
-            background=colors.normal50,
-            borderwidth=0,
-            highlightthickness=0,
-            font=self.button_font,
-            anchor='w',
-            activebackground=colors.normal_button,
-            highlightbackground=colors.normal_button,
-            highlightcolor=colors.normal_button,
-            relief=tk.FLAT
-            )
-
-        self.s3_decrease = tk.Button(
-            self.master.values_box,
-            text='-',
-            command=lambda slot=3: self.decrease(slot),
-            foreground=colors.background,
-            background=colors.normal50,
-            borderwidth=0,
-            highlightthickness=0,
-            font=self.button_font,
-            anchor='w',
-            activebackground=colors.normal_button,
-            highlightbackground=colors.normal_button,
-            highlightcolor=colors.normal_button,
-            relief=tk.FLAT
-            )
-
-        self.reset_offsets = tk.Button(
-            self.master.values_box,
-            text='Zero Offsets',
-            command=self.clear,
-            foreground=colors.background,
-            background=colors.cool50,
-            borderwidth=0,
-            highlightthickness=0,
-            font=self.button_font,
-            anchor='w',
-            activebackground=colors.normal_button,
-            highlightbackground=colors.normal_button,
-            highlightcolor=colors.normal_button,
-            relief=tk.FLAT
-            )
-
-        self.write_offsets = tk.Button(
-            self.master.values_box,
-            text='Save Offsets',
-            command=self.write,
-            foreground=colors.background,
-            background=colors.cool50,
-            borderwidth=0,
-            highlightthickness=0,
-            font=self.button_font,
-            anchor='w',
-            activebackground=colors.normal_button,
-            highlightbackground=colors.normal_button,
-            highlightcolor=colors.normal_button,
-            relief=tk.FLAT
-            )
+            self.write_offsets = tk.Button(
+                self.master.values_box,
+                text='Save Offsets',
+                command=self.write,
+                foreground=colors.background,
+                background=colors.cool50,
+                borderwidth=0,
+                highlightthickness=0,
+                font=self.button_font,
+                anchor='w',
+                activebackground=colors.normal_button,
+                highlightbackground=colors.normal_button,
+                highlightcolor=colors.normal_button,
+                relief=tk.FLAT
+                )
+        except Exception as e:
+            logger.exception('%s', e)
 
     def increase(self, slot):
         try:
-            id = self.full_ids[slot-1]
+            id = self.full_ids[slot]
             if id in self.calibrations:
                 offset = self.calibrations[id]
             else:
@@ -337,7 +211,7 @@ class gCalibrate(tk.Frame):
 
     def decrease(self, slot):
         try:
-            id = self.full_ids[slot-1]
+            id = self.full_ids[slot]
             if id in self.calibrations:
                 offset = self.calibrations[id]
             else:
@@ -364,60 +238,33 @@ class gCalibrate(tk.Frame):
             logger.exception('%s', e)
 
     def hide(self):
-        self.sensor1.place(x=0, y=0, height=0, width=0)
-        self.sensor2.place(x=0, y=0, height=0, width=0)
-        self.sensor3.place(x=0, y=0, height=0, width=0)
+        try:
+            for slot in range(3):
+                self.sensor_id_short[slot].place(x=0, y=0, height=0, width=0)
+                self.role[slot].place(x=0, y=0, height=0, width=0)
+                self.reported[slot].place(x=0, y=0, height=0, width=0)
+                self.actual[slot].place(x=0, y=0, height=0, width=0)
+                self.increase_btn[slot].place(x=0, y=0, height=0, width=0)
+                self.decrease_btn[slot].place(x=0, y=0, height=0, width=0)
 
-        self.role1.place(x=0, y=0, height=0, width=0)
-        self.role2.place(x=0, y=0, height=0, width=0)
-        self.role3.place(x=0, y=0, height=0, width=0)
-
-        self.reported1.place(x=0, y=0, height=0, width=0)
-        self.reported2.place(x=0, y=0, height=0, width=0)
-        self.reported3.place(x=0, y=0, height=0, width=0)
-
-        self.actual1.place(x=0, y=0, height=0, width=0)
-        self.actual2.place(x=0, y=0, height=0, width=0)
-        self.actual3.place(x=0, y=0, height=0, width=0)
-
-        self.s1_decrease.place(x=0, y=0, height=0, width=0)
-        self.s1_increase.place(x=0, y=0, height=0, width=0)
-
-        self.s2_decrease.place(x=0, y=0, height=0, width=0)
-        self.s2_increase.place(x=0, y=0, height=0, width=0)
-
-        self.s3_decrease.place(x=0, y=0, height=0, width=0)
-        self.s3_increase.place(x=0, y=0, height=0, width=0)
-
-        self.reset_offsets.place(x=0, y=0, height=0, width=0)
-        self.write_offsets.place(x=0, y=0, height=0, width=0)
+            self.reset_offsets.place(x=0, y=0, height=0, width=0)
+            self.write_offsets.place(x=0, y=0, height=0, width=0)
+        except Exception as e:
+            logger.exception('%s', e)
 
     def show(self):
-        self.populate_widgets()
+        try:
+            self.populate_widgets()
 
-        self.sensor1.place(x=140, y=30, height=80, width=100)
-        self.sensor2.place(x=140, y=90, height=80, width=100)
-        self.sensor3.place(x=140, y=150, height=80, width=100)
+            for slot in range(3):
+                self.sensor_id_short[slot].place(x=140, y=30+(slot*60), height=80, width=100)
+                self.role[slot].place(x=250, y=50+(slot*60), height=40, width=170)
+                self.reported[slot].place(x=440, y=30+(slot*60), height=80, width=100)
+                self.actual[slot].place(x=560, y=30+(slot*60), height=80, width=100)
+                self.increase_btn[slot].place(x=670, y=40+(slot*60), height=50, width=40)
+                self.decrease_btn[slot].place(x=740, y=40+(slot*60), height=50, width=40)
 
-        self.role1.place(x=250, y=50, height=40, width=170)
-        self.role2.place(x=250, y=110, height=40, width=170)
-        self.role3.place(x=250, y=170, height=40, width=170)
-
-        self.reported1.place(x=440, y=30, height=80, width=100)
-        self.reported2.place(x=440, y=90, height=80, width=100)
-        self.reported3.place(x=440, y=150, height=80, width=100)
-
-        self.actual1.place(x=560, y=30, height=80, width=100)
-        self.actual2.place(x=560, y=90, height=80, width=100)
-        self.actual3.place(x=560, y=150, height=80, width=100)
-
-        self.s1_increase.place(x=670, y=40, height=50, width=40)
-        self.s2_increase.place(x=670, y=100, height=50, width=40)
-        self.s3_increase.place(x=670, y=160, height=50, width=40)
-
-        self.s1_decrease.place(x=740, y=40, height=50, width=40)
-        self.s2_decrease.place(x=740, y=100, height=50, width=40)
-        self.s3_decrease.place(x=740, y=160, height=50, width=40)
-
-        self.reset_offsets.place(x=200, y=230, height=50, width=220)
-        self.write_offsets.place(x=480, y=230, height=50, width=240)
+            self.reset_offsets.place(x=200, y=230, height=50, width=220)
+            self.write_offsets.place(x=480, y=230, height=50, width=240)
+        except Exception as e:
+            logger.exception('%s', e)

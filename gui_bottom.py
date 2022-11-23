@@ -35,11 +35,11 @@ class gBottom(tk.Frame):
 
     def update_input(self):
         try:
-            self.master.after(6000, self.update_input)
+            self.master.after(4000, self.update_input)
 
             self.desired_state = self.xd.get(paths.desired)
             self.current_state = self.xd.get(paths.current)
-            self.chamber_temp = self.xd.get(paths.chamber_temp, 0.0)
+            self.chamber_temp = self.xd.get(paths.chamber_temp, 0.0) + self.xd.get(paths.chamber_temp_offset, 0.0)
 
             self.chamber['text'] = round(self.chamber_temp)
             self.desired['text'] = self.desired_state

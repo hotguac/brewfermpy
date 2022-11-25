@@ -55,7 +55,7 @@ class gBeerTemps(tk.Frame):
             text="+",
             command=self.plus_one,
             foreground=colors.background,
-            background=colors.normal50,
+            background=colors.warm400,
             borderwidth=0,
             highlightthickness=0,
             font=self.button_font,
@@ -70,7 +70,7 @@ class gBeerTemps(tk.Frame):
             text="10",
             command=self.plus_ten,
             foreground=colors.background,
-            background=colors.normal50,
+            background=colors.warm400,
             borderwidth=0,
             highlightthickness=0,
             font=self.button_font,
@@ -85,7 +85,7 @@ class gBeerTemps(tk.Frame):
             text="-",
             command=self.minus_one,
             foreground=colors.background,
-            background=colors.normal50,
+            background=colors.cool200,
             borderwidth=0,
             highlightthickness=0,
             font=self.button_font,
@@ -100,7 +100,7 @@ class gBeerTemps(tk.Frame):
             text="10",
             command=self.minus_ten,
             foreground=colors.background,
-            background=colors.normal50,
+            background=colors.cool200,
             borderwidth=0,
             highlightthickness=0,
             font=self.button_font,
@@ -166,9 +166,9 @@ class gBeerTemps(tk.Frame):
     def show_target(self):
         self.current.place(x=0, y=0, height=0, width=0)
 
-        self.warmer.place(x=160, y=80, height=80, width=80)
-        self.colder.place(x=160, y=180, height=80, width=80)
-        self.warmer10.place(x=260, y=80, height=80, width=100)
-        self.colder10.place(x=260, y=180, height=80, width=100)
+        self.warmer.place(x=200, y=70, height=80, width=80)
+        self.colder.place(x=200, y=170, height=80, width=80)
+        self.warmer10.place(x=300, y=70, height=80, width=100)
+        self.colder10.place(x=300, y=170, height=80, width=100)
 
         self.target.place(x=580, y=120, height=100, width=160)
